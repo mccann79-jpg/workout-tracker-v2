@@ -871,9 +871,52 @@
             container.appendChild(card);
             // Teal chart
             new Chart(document.getElementById(`chart-${exercise.name}-${exercise.equipment}`), {
-                type: 'line',
-                data: { labels: sorted.map(d => formatDate(d.date)), datasets: [{ label: 'Weight (lbs)', data: sorted.map(d => d.weight), borderColor: '#0d9488', backgroundColor: 'rgba(13, 148, 136, 0.06)', pointBackgroundColor: '#0d9488', pointBorderColor: '#0d9488', pointRadius: 3, pointHoverRadius: 5, tension: 0.3, fill: true, borderWidth: 2 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false, grid: { color: '#e2e8f0' }, ticks: { callback: v => v + ' lbs' } }, x: { grid: { color: '#f1f5f9' } } } }
+                type: 'bar',
+                data: {
+                    labels: sorted.map(d => formatDate(d.date)),
+                    datasets: [
+                        {
+                            label: 'Reps',
+                            data: sorted.map(d => d.reps),
+                            backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                            borderColor: 'rgba(13, 148, 136, 0.2)',
+                            borderWidth: 1,
+                            borderRadius: 3,
+                            yAxisID: 'yReps',
+                            order: 2
+                        },
+                        {
+                            label: 'Weight (lbs)',
+                            type: 'line',
+                            data: sorted.map(d => d.weight),
+                            borderColor: '#0d9488',
+                            backgroundColor: 'rgba(13, 148, 136, 0.04)',
+                            pointBackgroundColor: '#0d9488',
+                            pointBorderColor: '#0d9488',
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            tension: 0.3,
+                            fill: true,
+                            borderWidth: 2,
+                            yAxisID: 'y',
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: true, position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, padding: 8, font: { size: 11 }, usePointStyle: true, pointStyle: 'rectRounded' } },
+                        tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label === 'Reps' ? `${ctx.parsed.y} reps` : `${ctx.parsed.y} lbs`; } } }
+                    },
+                    scales: {
+                        y: { position: 'left', beginAtZero: false, grid: { color: '#e2e8f0' }, ticks: { callback: v => v + ' lbs', font: { size: 11 } } },
+                        yReps: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { stepSize: 1, callback: v => v + ' r', font: { size: 11 } } },
+                        x: { grid: { color: '#f1f5f9' } }
+                    }
+                }
             });
         });
     }

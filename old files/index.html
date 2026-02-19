@@ -107,6 +107,49 @@
         select option { background: var(--bg-card); color: var(--text-primary); }
         select optgroup { font-weight: 700; font-size: 12px; color: var(--accent); padding: 6px 0 2px; font-style: normal; }
         select optgroup option { font-weight: 400; font-size: 15px; color: var(--text-primary); padding-left: 8px; }
+
+        /* ─── Custom Exercise Picker ─── */
+        .exercise-picker {
+            margin-top: 6px;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-input);
+        }
+        .exercise-picker:empty { display: none; }
+        .picker-group-label {
+            padding: 6px 12px 3px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            z-index: 1;
+        }
+        .picker-item {
+            padding: 9px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background .1s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .picker-item:last-child { border-bottom: none; }
+        .picker-item:hover, .picker-item:active { background: var(--accent-light); }
+        .picker-item.selected { background: var(--accent-light); font-weight: 600; }
+        .picker-item .picker-equip { font-size: 11px; color: var(--text-muted); }
+        .picker-empty { padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
+        @media (min-width: 768px) {
+            .exercise-picker { max-height: 280px; }
+        }
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         /* ─── Buttons ─── */
@@ -287,7 +330,8 @@
                                 <div class="form-group">
                                     <label class="form-label">Exercise</label>
                                     <input type="text" id="exercise-search" placeholder="Search exercises…" autocomplete="off">
-                                    <div style="margin-top:6px;"><select id="exercise-select" required size="5" style="height:auto;"><option value="">Select an exercise…</option></select></div>
+                                    <input type="hidden" id="exercise-select-value" required>
+                                    <div id="exercise-picker" class="exercise-picker"></div>
                                 </div>
                                 <div id="exercise-details" style="display:none;">
                                     <div class="form-group"><span class="tag tag-equipment" id="equipment-type"></span></div>
@@ -622,40 +666,55 @@
         try { const docRef = await db.collection('workouts').add(entry); entry.id = docRef.id; return true; } catch (e) { showToast('Error saving data.', 'error'); return false; }
     }
 
-    // ═══ Exercise Dropdown ═══
+    // ═══ Exercise Picker ═══
+    let selectedExerciseIdx = null;
+
     function populateExerciseDropdown(filterTerm = '') {
-        const select = document.getElementById('exercise-select');
-        select.innerHTML = '';
+        const picker = document.getElementById('exercise-picker');
         const sorted = exercises.map((ex, idx) => ({ ...ex, idx }))
             .sort((a, b) => a.muscle.localeCompare(b.muscle) || a.name.localeCompare(b.name));
 
         const term = filterTerm.toLowerCase();
         let currentMuscle = '';
-        let currentGroup = null;
-        let hasResults = false;
+        let html = '';
+        let count = 0;
 
         sorted.forEach(ex => {
             if (term && !ex.name.toLowerCase().includes(term) && !ex.equipment.toLowerCase().includes(term) && !ex.muscle.toLowerCase().includes(term)) return;
             if (currentMuscle !== ex.muscle) {
                 currentMuscle = ex.muscle;
-                currentGroup = document.createElement('optgroup');
-                currentGroup.label = ex.muscle;
-                select.appendChild(currentGroup);
+                html += `<div class="picker-group-label">${ex.muscle}</div>`;
             }
-            const o = document.createElement('option');
-            o.value = ex.idx;
-            o.textContent = `${ex.name} (${ex.equipment})`;
-            currentGroup.appendChild(o);
-            hasResults = true;
+            const sel = selectedExerciseIdx === ex.idx ? ' selected' : '';
+            html += `<div class="picker-item${sel}" data-idx="${ex.idx}" onclick="selectExercise(${ex.idx})"><span>${ex.name}</span><span class="picker-equip">${ex.equipment}</span></div>`;
+            count++;
         });
 
-        if (!hasResults) {
-            const o = document.createElement('option');
-            o.value = '';
-            o.textContent = 'No exercises match…';
-            o.disabled = true;
-            select.appendChild(o);
+        picker.innerHTML = count ? html : '<div class="picker-empty">No exercises match</div>';
+    }
+
+    function selectExercise(idx) {
+        selectedExerciseIdx = idx;
+        document.getElementById('exercise-select-value').value = idx;
+
+        // Highlight selected
+        document.querySelectorAll('.picker-item').forEach(el => el.classList.toggle('selected', parseInt(el.dataset.idx) === idx));
+
+        // Show details
+        const exercise = exercises[idx];
+        const details = document.getElementById('exercise-details');
+        const lastWorkoutDiv = document.getElementById('last-workout-info');
+        document.getElementById('equipment-type').textContent = exercise.equipment;
+        const hist = workoutData.filter(d => d.exercise === exercise.name && d.equipment === exercise.equipment).sort((a, b) => new Date(b.date) - new Date(a.date));
+        if (hist.length > 0) {
+            const last = hist[0];
+            lastWorkoutDiv.innerHTML = `Last: <strong>${last.weight} lbs × ${last.reps} reps</strong>&nbsp; ${formatDate(last.date)}`;
+            lastWorkoutDiv.style.display = 'flex';
+        } else {
+            lastWorkoutDiv.innerHTML = 'No previous workouts recorded';
+            lastWorkoutDiv.style.display = 'flex';
         }
+        details.style.display = 'block';
     }
 
     document.getElementById('exercise-search').addEventListener('input', function() {
@@ -787,24 +846,11 @@
 
     function setTodayDate() { document.getElementById('date-input').value = new Date().toISOString().split('T')[0]; }
 
-    // ═══ Exercise Select Handler ═══
-    document.getElementById('exercise-select').addEventListener('change', function() {
-        const details = document.getElementById('exercise-details');
-        const lastWorkoutDiv = document.getElementById('last-workout-info');
-        if (this.value !== '') {
-            const exercise = exercises[this.value];
-            document.getElementById('equipment-type').textContent = exercise.equipment;
-            const hist = workoutData.filter(d => d.exercise === exercise.name && d.equipment === exercise.equipment).sort((a, b) => new Date(b.date) - new Date(a.date));
-            if (hist.length > 0) { const last = hist[0]; lastWorkoutDiv.innerHTML = `Last: <strong>${last.weight} lbs × ${last.reps} reps</strong>&nbsp; ${formatDate(last.date)}`; lastWorkoutDiv.style.display = 'flex'; }
-            else { lastWorkoutDiv.innerHTML = 'No previous workouts recorded'; lastWorkoutDiv.style.display = 'flex'; }
-            details.style.display = 'block';
-        } else { details.style.display = 'none'; lastWorkoutDiv.style.display = 'none'; }
-    });
-
     // ═══ Log Workout ═══
     document.getElementById('workout-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const exerciseIdx = document.getElementById('exercise-select').value;
+        const exerciseIdx = document.getElementById('exercise-select-value').value;
+        if (!exerciseIdx && exerciseIdx !== 0) { showToast('Select an exercise.', 'error'); return; }
         const weight = parseFloat(document.getElementById('weight-input').value);
         const reps = parseInt(document.getElementById('reps-input').value);
         const date = document.getElementById('date-input').value;
@@ -820,7 +866,8 @@
         document.getElementById('weight-input').value = '';
         document.getElementById('reps-input').value = '';
         setTodayDate();
-        document.getElementById('exercise-select').dispatchEvent(new Event('change'));
+        // Re-select same exercise to refresh last workout info
+        selectExercise(parseInt(exerciseIdx));
         renderProgress(); renderTodaysWorkouts(); renderSummary();
     });
 
@@ -839,7 +886,8 @@
         const filter = document.getElementById('muscle-filter').value;
         container.innerHTML = '';
         if (workoutData.length === 0) { container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon">📊</div><div class="empty-state-text">No data yet. Start logging workouts!</div></div>'; return; }
-        const filteredExercises = exercises.filter(ex => !filter || ex.muscle === filter);
+        const filteredExercises = exercises.filter(ex => !filter || ex.muscle === filter)
+            .sort((a, b) => a.muscle.localeCompare(b.muscle) || a.name.localeCompare(b.name));
         let currentMuscle = '';
         filteredExercises.forEach(exercise => {
             const exerciseData = workoutData.filter(d => d.exercise === exercise.name && d.equipment === exercise.equipment);

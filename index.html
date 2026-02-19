@@ -84,8 +84,8 @@
 
         /* ─── Bottom Nav ─── */
         .bottom-nav { display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 4px 0 calc(4px + var(--safe-bottom)); flex-shrink: 0; }
-        .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 0; background: none; border: none; color: var(--text-muted); font-family: var(--font); font-size: 10px; font-weight: 500; cursor: pointer; transition: color .2s; position: relative; }
-        .tab-btn svg { width: 22px; height: 22px; }
+        .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 0; background: none; border: none; color: var(--text-muted); font-family: var(--font); font-size: 9px; font-weight: 500; cursor: pointer; transition: color .2s; position: relative; }
+        .tab-btn svg { width: 20px; height: 20px; }
         .tab-btn.active { color: var(--accent); }
         .tab-btn.active::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:20px; height:2px; background:var(--accent); border-radius:1px; }
 
@@ -263,6 +263,48 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 
+        /* ─── History ─── */
+        .week-block { margin-bottom: 20px; }
+        .week-header {
+            display: flex; justify-content: space-between; align-items: baseline;
+            padding: 8px 0 6px; margin-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+        }
+        .week-title { font-weight: 700; font-size: 15px; color: var(--text-primary); }
+        .week-range { font-size: 12px; color: var(--text-muted); }
+        .week-stats { display: flex; gap: 12px; font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+        .week-stats span { display: inline-flex; align-items: center; gap: 3px; }
+
+        .day-card {
+            background: var(--bg-card); border-radius: var(--radius); padding: 14px 16px;
+            margin-bottom: 8px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+        }
+        .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .day-date { font-weight: 700; font-size: 14px; }
+        .day-muscles { display: flex; flex-wrap: wrap; gap: 4px; }
+        .day-muscles .tag { font-size: 10px; padding: 1px 7px; }
+        .day-exercise-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 6px 0; border-top: 1px solid var(--border); font-size: 13px;
+        }
+        .day-exercise-row:first-of-type { border-top: none; }
+        .day-ex-name { font-weight: 500; color: var(--text-primary); }
+        .day-ex-equip { font-size: 11px; color: var(--text-muted); margin-left: 4px; }
+        .day-ex-sets { font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 700; white-space: nowrap; }
+
+        .day-volume-row {
+            display: flex; justify-content: flex-end; gap: 12px;
+            padding-top: 6px; margin-top: 4px; border-top: 1px dashed var(--border);
+            font-size: 11px; color: var(--text-muted); font-weight: 600;
+        }
+
+        @media (min-width: 768px) {
+            .history-days-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        }
+        @media (min-width: 1024px) {
+            .history-days-grid { grid-template-columns: 1fr 1fr 1fr; }
+        }
+
         /* ═══ RESPONSIVE — Tablet 768px+ ═══ */
         @media (min-width: 768px) {
             .page { padding: 20px 28px 28px; }
@@ -350,6 +392,11 @@
                 </div>
             </div></div>
 
+            <!-- HISTORY -->
+            <div id="history-page" class="page"><div class="page-inner">
+                <div id="history-container"></div>
+            </div></div>
+
             <!-- PROGRESS -->
             <div id="progress-page" class="page"><div class="page-inner">
                 <div class="filter-bar"><select id="muscle-filter"><option value="">All Muscle Groups</option></select></div>
@@ -412,6 +459,7 @@
 
         <div class="bottom-nav">
             <button class="tab-btn active" onclick="showPage('log',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Log</button>
+            <button class="tab-btn" onclick="showPage('history',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>History</button>
             <button class="tab-btn" onclick="showPage('progress',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-4 4"/></svg>Progress</button>
             <button class="tab-btn" onclick="showPage('goals',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Goals</button>
             <button class="tab-btn" onclick="showPage('exercises',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Exercises</button>
@@ -878,6 +926,7 @@
         document.getElementById(`${page}-page`).classList.add('active');
         if (btn) btn.classList.add('active');
         if (page === 'progress') renderProgress();
+        if (page === 'history') renderHistory();
     }
 
     // ═══ Render Progress — with teal charts ═══
@@ -971,6 +1020,133 @@
 
     function toggleEntries(cardId) { document.getElementById(cardId).classList.toggle('expanded'); }
     function formatDate(dateStr) { const d = new Date(dateStr); return (d.getMonth() + 1) + '/' + d.getDate(); }
+
+    // ═══ History ═══
+    function renderHistory() {
+        const container = document.getElementById('history-container');
+        if (workoutData.length === 0) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">No workout history yet.</div></div>';
+            return;
+        }
+
+        // Group by date
+        const byDate = {};
+        workoutData.forEach(e => {
+            if (!byDate[e.date]) byDate[e.date] = [];
+            byDate[e.date].push(e);
+        });
+
+        // Sort dates descending
+        const dates = Object.keys(byDate).sort((a, b) => new Date(b) - new Date(a));
+
+        // Group dates into weeks (Mon–Sun)
+        const weeks = [];
+        let currentWeek = null;
+
+        dates.forEach(dateStr => {
+            const d = new Date(dateStr + 'T12:00:00'); // noon to avoid TZ issues
+            const day = d.getDay();
+            // Monday as start of week
+            const mon = new Date(d);
+            mon.setDate(d.getDate() - ((day + 6) % 7));
+            const weekKey = mon.toISOString().split('T')[0];
+
+            if (!currentWeek || currentWeek.key !== weekKey) {
+                const sun = new Date(mon);
+                sun.setDate(mon.getDate() + 6);
+                currentWeek = { key: weekKey, monDate: new Date(mon), sunDate: new Date(sun), days: [] };
+                weeks.push(currentWeek);
+            }
+            currentWeek.days.push({ date: dateStr, entries: byDate[dateStr] });
+        });
+
+        const fmtShort = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const fmtDay = d => {
+            const dt = new Date(d + 'T12:00:00');
+            const today = new Date(); today.setHours(12,0,0,0);
+            const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+            if (dt.toDateString() === today.toDateString()) return 'Today';
+            if (dt.toDateString() === yesterday.toDateString()) return 'Yesterday';
+            return dt.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+        };
+
+        // Determine week label
+        const now = new Date(); now.setHours(12,0,0,0);
+        const nowDay = now.getDay();
+        const thisMon = new Date(now);
+        thisMon.setDate(now.getDate() - ((nowDay + 6) % 7));
+        const thisWeekKey = thisMon.toISOString().split('T')[0];
+        const lastMon = new Date(thisMon);
+        lastMon.setDate(thisMon.getDate() - 7);
+        const lastWeekKey = lastMon.toISOString().split('T')[0];
+
+        let html = '';
+
+        weeks.forEach(week => {
+            const allEntries = week.days.flatMap(d => d.entries);
+            const totalSets = allEntries.length;
+            const totalVol = allEntries.reduce((s, e) => s + e.weight * e.reps, 0);
+            const muscles = [...new Set(allEntries.map(e => e.muscle))];
+            const sessions = week.days.length;
+
+            let label;
+            if (week.key === thisWeekKey) label = 'This Week';
+            else if (week.key === lastWeekKey) label = 'Last Week';
+            else label = `Week of ${fmtShort(week.monDate)}`;
+
+            html += `<div class="week-block">
+                <div class="week-header">
+                    <div>
+                        <div class="week-title">${label}</div>
+                        <div class="week-range">${fmtShort(week.monDate)} – ${fmtShort(week.sunDate)}</div>
+                    </div>
+                    <div class="week-stats">
+                        <span>${sessions} session${sessions !== 1 ? 's' : ''}</span>
+                        <span>${totalSets} sets</span>
+                        <span>${totalVol >= 1000 ? (totalVol / 1000).toFixed(1) + 'k' : totalVol} lbs</span>
+                    </div>
+                </div>
+                <div class="history-days-grid">`;
+
+            week.days.forEach(day => {
+                const dayMuscles = [...new Set(day.entries.map(e => e.muscle))];
+                const dayVol = day.entries.reduce((s, e) => s + e.weight * e.reps, 0);
+
+                // Group entries by exercise+equipment
+                const grouped = {};
+                day.entries.forEach(e => {
+                    const key = `${e.exercise}|||${e.equipment}|||${e.muscle}`;
+                    if (!grouped[key]) grouped[key] = [];
+                    grouped[key].push(e);
+                });
+
+                html += `<div class="day-card">
+                    <div class="day-header">
+                        <div class="day-date">${fmtDay(day.date)}</div>
+                        <div class="day-muscles">${dayMuscles.map(m => `<span class="tag tag-muscle">${m}</span>`).join('')}</div>
+                    </div>`;
+
+                Object.entries(grouped).forEach(([key, sets]) => {
+                    const [name, equip, muscle] = key.split('|||');
+                    const best = Math.max(...sets.map(s => s.weight));
+                    const setsStr = sets.map(s => `${s.weight}×${s.reps}`).join(', ');
+                    html += `<div class="day-exercise-row">
+                        <div><span class="day-ex-name">${name}</span><span class="day-ex-equip">${equip}</span></div>
+                        <div class="day-ex-sets">${setsStr}</div>
+                    </div>`;
+                });
+
+                html += `<div class="day-volume-row">
+                    <span>${day.entries.length} sets</span>
+                    <span>${dayVol >= 1000 ? (dayVol / 1000).toFixed(1) + 'k' : dayVol} lbs vol</span>
+                </div></div>`;
+            });
+
+            html += '</div></div>';
+        });
+
+        container.innerHTML = html;
+    }
 
     // ═══ Edit Entry ═══
     function editEntry(entry) {

@@ -492,6 +492,14 @@
                         <button type="submit" class="btn btn-primary" id="exercise-submit-btn">Add Exercise</button>
                         <button type="button" class="btn btn-secondary" id="cancel-edit-btn" style="display:none;margin-top:8px;" onclick="cancelExerciseEdit()">Cancel Edit</button>
                     </form>
+                    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button onclick="exportExercises()" class="btn btn-secondary" style="flex:1;min-width:120px;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:4px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export</button>
+                            <button onclick="document.getElementById('import-exercises-file').click()" class="btn btn-secondary" style="flex:1;min-width:120px;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:4px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>Import</button>
+                            <input type="file" id="import-exercises-file" accept=".csv" style="display:none;" onchange="importExercises(event)">
+                        </div>
+                        <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">Export/import custom exercises as CSV</p>
+                    </div>
                 </div>
                 <div class="card">
                     <div class="card-title">All Exercises</div>
@@ -957,6 +965,120 @@
     }
     document.getElementById('exercise-list-search').addEventListener('input', renderExercisesList);
 
+    // ═══ Export/Import Exercises ═══
+    function exportExercises() {
+        // Get only custom exercises
+        const customExercises = exercises.filter(ex => !defaultExercises.some(def => def.name === ex.name && def.equipment === ex.equipment));
+        
+        if (customExercises.length === 0) {
+            showToast('No custom exercises to export.', 'info');
+            return;
+        }
+        
+        // Create CSV content
+        const headers = ['muscle', 'name', 'equipment', 'primary', 'secondary'];
+        const rows = customExercises.map(ex => [
+            ex.muscle || '',
+            ex.name || '',
+            ex.equipment || '',
+            (ex.primary || []).join('; '),
+            (ex.secondary || []).join('; ')
+        ]);
+        
+        const csvContent = [headers.join(','), ...rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(','))].join('\n');
+        
+        // Download file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `custom-exercises-${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        
+        showToast(`Exported ${customExercises.length} exercises!`);
+    }
+    
+    async function importExercises(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const text = e.target.result;
+                const lines = text.split('\n').filter(line => line.trim());
+                
+                if (lines.length < 2) {
+                    showToast('CSV file is empty or invalid.', 'error');
+                    return;
+                }
+                
+                // Parse header
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, ''));
+                const muscleIdx = headers.indexOf('muscle');
+                const nameIdx = headers.indexOf('name');
+                const equipmentIdx = headers.indexOf('equipment');
+                const primaryIdx = headers.indexOf('primary');
+                const secondaryIdx = headers.indexOf('secondary');
+                
+                if (nameIdx === -1 || equipmentIdx === -1) {
+                    showToast('CSV must have "name" and "equipment" columns.', 'error');
+                    return;
+                }
+                
+                let imported = 0, skipped = 0;
+                
+                for (let i = 1; i < lines.length; i++) {
+                    // Parse CSV line (handle quoted values)
+                    const row = [];
+                    let current = '';
+                    let inQuotes = false;
+                    for (let c of lines[i]) {
+                        if (c === '"') { inQuotes = !inQuotes; }
+                        else if (c === ',' && !inQuotes) { row.push(current.trim()); current = ''; }
+                        else { current += c; }
+                    }
+                    row.push(current.trim());
+                    
+                    const name = row[nameIdx]?.replace(/"/g, '').trim();
+                    const equipment = row[equipmentIdx]?.replace(/"/g, '').trim();
+                    
+                    if (!name || !equipment) continue;
+                    
+                    // Check if already exists
+                    if (exercises.some(ex => ex.name.toLowerCase() === name.toLowerCase() && ex.equipment.toLowerCase() === equipment.toLowerCase())) {
+                        skipped++;
+                        continue;
+                    }
+                    
+                    const muscle = muscleIdx !== -1 ? row[muscleIdx]?.replace(/"/g, '').trim().toUpperCase() : 'OTHER';
+                    const primaryStr = primaryIdx !== -1 ? row[primaryIdx]?.replace(/"/g, '').trim() : '';
+                    const secondaryStr = secondaryIdx !== -1 ? row[secondaryIdx]?.replace(/"/g, '').trim() : '';
+                    
+                    const primary = primaryStr ? primaryStr.split(';').map(s => s.trim()).filter(s => s) : [];
+                    const secondary = secondaryStr ? secondaryStr.split(';').map(s => s.trim()).filter(s => s) : [];
+                    
+                    const saved = await saveCustomExercise({ muscle, name, equipment, primary, secondary });
+                    if (saved) imported++;
+                }
+                
+                await loadCustomExercises();
+                renderExercisesList();
+                populateExerciseDropdown();
+                populateGoalExerciseDropdown();
+                
+                let msg = `Imported ${imported} exercises!`;
+                if (skipped > 0) msg += ` (${skipped} duplicates skipped)`;
+                showToast(msg);
+                
+            } catch (err) {
+                console.error('Import error:', err);
+                showToast('Error importing exercises.', 'error');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = ''; // Reset file input
+    }
+
     // ═══ Goal Form ═══
     document.getElementById('goal-form').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -1217,7 +1339,14 @@
             sevenDaysAgo.setDate(today.getDate() - 7);
             const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
             
-            const allMuscleGroups = ['Chest', 'Upper Chest', 'Back', 'Lats', 'Mid Back', 'Front Delts', 'Side Delts', 'Rear Delts', 'Biceps', 'Triceps', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Abs', 'Core', 'Traps', 'Forearms', 'Lower Back', 'Neck'];
+            // Dynamically build muscle groups from all exercises
+            const allMuscleGroupsSet = new Set();
+            exercises.forEach(ex => {
+                if (ex.primary) ex.primary.forEach(m => allMuscleGroupsSet.add(m));
+                if (ex.secondary) ex.secondary.forEach(m => allMuscleGroupsSet.add(m));
+            });
+            const allMuscleGroups = Array.from(allMuscleGroupsSet).sort();
+            
             const hitPrimary = new Set();
             const hitSecondary = new Set();
             
@@ -1297,9 +1426,28 @@
                 html += '</div></div>';
 
                 grouped.forEach(function(g) {
+                    // Find the exercise to get primary/secondary
+                    var ex = exercises.find(function(e) { return e.name === g.name && e.equipment === g.equip; });
                     var setsStr = g.sets.map(function(s) { return (s.weight || 0) + '×' + (s.reps || 0); }).join(', ');
+                    
                     html += '<div class="day-exercise-row">';
+                    html += '<div style="flex:1;">';
                     html += '<div><span class="day-ex-name">' + g.name + '</span><span class="day-ex-equip">' + g.equip + '</span></div>';
+                    
+                    // Add primary/secondary muscles
+                    if (ex && ((ex.primary && ex.primary.length > 0) || (ex.secondary && ex.secondary.length > 0))) {
+                        html += '<div style="font-size:10px;margin-top:2px;">';
+                        if (ex.primary && ex.primary.length > 0) {
+                            html += '<span style="color:var(--accent);">' + ex.primary.join(', ') + '</span>';
+                        }
+                        if (ex.secondary && ex.secondary.length > 0) {
+                            if (ex.primary && ex.primary.length > 0) html += ' <span style="color:var(--text-muted);">·</span> ';
+                            html += '<span style="color:var(--text-muted);">' + ex.secondary.join(', ') + '</span>';
+                        }
+                        html += '</div>';
+                    }
+                    
+                    html += '</div>';
                     html += '<div class="day-ex-sets">' + setsStr + '</div>';
                     html += '</div>';
                 });

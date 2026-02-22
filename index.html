@@ -422,6 +422,7 @@
             <!-- LOG -->
             <div id="log-page" class="page active"><div class="page-inner">
                 <div id="summary-bar" class="summary-bar" style="display:none;"></div>
+                <div id="log-muscle-coverage" class="muscle-coverage-summary" style="margin-bottom:12px;"></div>
                 <div class="log-grid">
                     <div>
                         <div class="card">
@@ -435,7 +436,7 @@
                                     <div id="exercise-picker" class="exercise-picker"></div>
                                 </div>
                                 <div id="exercise-details" style="display:none;">
-                                    <div class="form-group"><span class="tag tag-equipment" id="equipment-type"></span></div>
+                                    <div class="form-group"><span class="tag tag-equipment" id="equipment-type"></span><span id="exercise-muscles-info" style="margin-left:8px;font-size:11px;"></span></div>
                                     <div id="last-workout-info" style="display:none;" class="last-entry-bar"></div>
                                     <div class="input-row">
                                         <div class="form-group"><label class="form-label">Weight (lbs)</label><input type="number" id="weight-input" step="0.5" placeholder="0" required inputmode="decimal"></div>
@@ -676,6 +677,70 @@
         renderGoals();
         renderSummary();
         renderHistory();
+        renderLogMuscleCoverage();
+    }
+
+    // ═══ Log Page Muscle Coverage ═══
+    function renderLogMuscleCoverage() {
+        const container = document.getElementById('log-muscle-coverage');
+        
+        if (!workoutData || workoutData.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        // Calculate muscle coverage for last 7 days
+        const today = new Date();
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+        
+        // Dynamically build muscle groups from all exercises
+        const allMuscleGroupsSet = new Set();
+        exercises.forEach(ex => {
+            if (ex.primary) ex.primary.forEach(m => allMuscleGroupsSet.add(m));
+            if (ex.secondary) ex.secondary.forEach(m => allMuscleGroupsSet.add(m));
+        });
+        const allMuscleGroups = Array.from(allMuscleGroupsSet).sort();
+        
+        if (allMuscleGroups.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        const hitPrimary = new Set();
+        const hitSecondary = new Set();
+        
+        workoutData.forEach(entry => {
+            if (entry.date && entry.date >= sevenDaysAgoStr) {
+                const ex = exercises.find(e => e.name === entry.exercise && e.equipment === entry.equipment);
+                if (ex) {
+                    if (ex.primary) ex.primary.forEach(m => hitPrimary.add(m));
+                    if (ex.secondary) ex.secondary.forEach(m => { if (!hitPrimary.has(m)) hitSecondary.add(m); });
+                }
+            }
+        });
+        
+        let html = '<div class="coverage-title">Muscle Coverage (Last 7 Days)</div>';
+        html += '<div class="coverage-grid">';
+        allMuscleGroups.forEach(m => {
+            if (hitPrimary.has(m)) {
+                html += '<span class="coverage-tag hit-primary">' + m + '</span>';
+            } else if (hitSecondary.has(m)) {
+                html += '<span class="coverage-tag hit-secondary">' + m + '</span>';
+            } else {
+                html += '<span class="coverage-tag not-hit">' + m + '</span>';
+            }
+        });
+        html += '</div>';
+        html += '<div class="coverage-legend">';
+        html += '<span><span class="legend-dot primary"></span> Primary</span>';
+        html += '<span><span class="legend-dot secondary"></span> Secondary</span>';
+        html += '<span><span class="legend-dot none"></span> Not Hit</span>';
+        html += '</div>';
+        
+        container.innerHTML = html;
+        container.style.display = 'block';
     }
 
     // ═══ Summary Stats ═══
@@ -806,7 +871,30 @@
                 html += `<div class="picker-group-label">${ex.muscle}</div>`;
             }
             const sel = selectedExerciseIdx === ex.idx ? ' selected' : '';
-            html += `<div class="picker-item${sel}" data-idx="${ex.idx}" onclick="selectExercise(${ex.idx})"><span>${ex.name}</span><span class="picker-equip">${ex.equipment}</span></div>`;
+            
+            // Build muscle info
+            let muscleInfo = '';
+            if ((ex.primary && ex.primary.length > 0) || (ex.secondary && ex.secondary.length > 0)) {
+                muscleInfo = '<div style="font-size:10px;margin-top:2px;">';
+                if (ex.primary && ex.primary.length > 0) {
+                    muscleInfo += '<span style="color:var(--accent);">' + ex.primary.join(', ') + '</span>';
+                }
+                if (ex.secondary && ex.secondary.length > 0) {
+                    if (ex.primary && ex.primary.length > 0) muscleInfo += ' <span style="color:var(--text-muted);">·</span> ';
+                    muscleInfo += '<span style="color:var(--text-muted);">' + ex.secondary.join(', ') + '</span>';
+                }
+                muscleInfo += '</div>';
+            }
+            
+            html += `<div class="picker-item${sel}" data-idx="${ex.idx}" onclick="selectExercise(${ex.idx})">
+                <div style="flex:1;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>${ex.name}</span>
+                        <span class="picker-equip">${ex.equipment}</span>
+                    </div>
+                    ${muscleInfo}
+                </div>
+            </div>`;
             count++;
         });
 
@@ -824,7 +912,23 @@
         const exercise = exercises[idx];
         const details = document.getElementById('exercise-details');
         const lastWorkoutDiv = document.getElementById('last-workout-info');
+        const musclesInfo = document.getElementById('exercise-muscles-info');
+        
         document.getElementById('equipment-type').textContent = exercise.equipment;
+        
+        // Show primary/secondary muscles
+        let muscleHtml = '';
+        if ((exercise.primary && exercise.primary.length > 0) || (exercise.secondary && exercise.secondary.length > 0)) {
+            if (exercise.primary && exercise.primary.length > 0) {
+                muscleHtml += '<span style="color:var(--accent);">' + exercise.primary.join(', ') + '</span>';
+            }
+            if (exercise.secondary && exercise.secondary.length > 0) {
+                if (exercise.primary && exercise.primary.length > 0) muscleHtml += ' <span style="color:var(--text-muted);">·</span> ';
+                muscleHtml += '<span style="color:var(--text-muted);">' + exercise.secondary.join(', ') + '</span>';
+            }
+        }
+        musclesInfo.innerHTML = muscleHtml;
+        
         const hist = workoutData.filter(d => d.exercise === exercise.name && d.equipment === exercise.equipment).sort((a, b) => new Date(b.date) - new Date(a.date));
         if (hist.length > 0) {
             const last = hist[0];
@@ -1192,7 +1296,7 @@
         setTodayDate();
         // Re-select same exercise to refresh last workout info
         selectExercise(parseInt(exerciseIdx));
-        renderProgress(); renderTodaysWorkouts(); renderSummary();
+        renderProgress(); renderTodaysWorkouts(); renderSummary(); renderLogMuscleCoverage();
     });
 
     // ═══ Page Navigation ═══
@@ -1489,7 +1593,7 @@
             await db.collection('workouts').doc(id).update({ weight, reps, date });
             const entry = workoutData.find(e => e.id === id);
             if (entry) { entry.weight = weight; entry.reps = reps; entry.date = date; }
-            closeEditModal(); renderProgress(); renderTodaysWorkouts(); renderSummary();
+            closeEditModal(); renderProgress(); renderTodaysWorkouts(); renderSummary(); renderLogMuscleCoverage();
             showToast('Entry updated!');
         } catch (error) { showToast('Error updating entry.', 'error'); }
     });
@@ -1502,7 +1606,7 @@
         try {
             await db.collection('workouts').doc(id).delete();
             workoutData = workoutData.filter(e => e.id !== id);
-            renderProgress(); renderTodaysWorkouts(); renderSummary();
+            renderProgress(); renderTodaysWorkouts(); renderSummary(); renderLogMuscleCoverage();
             showToast('Entry deleted.');
         } catch (error) { showToast('Error deleting entry.', 'error'); }
     }
@@ -1552,7 +1656,7 @@
                 imported.forEach(entry => { const docRef = db.collection('workouts').doc(); batch.set(docRef, entry); });
                 await batch.commit();
                 await loadData(); closeImportModal();
-                renderProgress(); renderTodaysWorkouts(); renderSummary();
+                renderProgress(); renderTodaysWorkouts(); renderSummary(); renderLogMuscleCoverage();
                 showToast(mode === 'replace' ? 'Data replaced!' : 'Data imported!');
             } catch (error) { showToast('Import error.', 'error'); }
         };
@@ -1570,7 +1674,7 @@
             snapshot.docs.forEach(doc => batch.delete(doc.ref));
             await batch.commit();
             workoutData = [];
-            renderProgress(); renderTodaysWorkouts(); renderSummary();
+            renderProgress(); renderTodaysWorkouts(); renderSummary(); renderLogMuscleCoverage();
             showToast('All data cleared.');
         } catch (error) { showToast('Error clearing data.', 'error'); }
     }

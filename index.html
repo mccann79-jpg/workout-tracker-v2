@@ -68,11 +68,11 @@
         .status-bar-spacer { min-height: var(--safe-top); background: var(--bg); }
 
         /* ─── Header ─── */
-        .header { background: var(--bg); padding: 8px 20px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .header { background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); padding: 20px 20px 18px; border-bottom: none; box-shadow: 0 2px 12px rgba(13, 148, 136, 0.25); flex-shrink: 0; }
         .header-row { display: flex; align-items: center; justify-content: space-between; }
-        .logo { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: 4px; }
-        .header-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-        .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; margin-right: 4px; animation: pulse-dot 2s infinite; }
+        .logo { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: 4px; }
+        .header-subtitle { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 1px; }
+        .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; display: inline-block; margin-right: 4px; animation: pulse-dot 2s infinite; }
         @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
 
         /* ─── Pages ─── */
@@ -111,7 +111,7 @@
         /* ─── Custom Exercise Picker ─── */
         .exercise-picker {
             margin-top: 6px;
-            max-height: 220px;
+            max-height: 320px;
             overflow-y: auto;
             border: 1.5px solid var(--border);
             border-radius: var(--radius-sm);
@@ -148,7 +148,7 @@
         .picker-empty { padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px; }
 
         @media (min-width: 768px) {
-            .exercise-picker { max-height: 280px; }
+            .exercise-picker { max-height: 380px; }
         }
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 

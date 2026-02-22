@@ -264,6 +264,65 @@
         ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 
         /* ─── History ─── */
+        .muscle-coverage-summary {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .coverage-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .coverage-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .coverage-tag {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .coverage-tag.hit-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .coverage-tag.hit-secondary {
+            background: var(--accent-light);
+            color: var(--accent-text);
+        }
+        .coverage-tag.not-hit {
+            background: var(--bg-elevated);
+            color: var(--text-muted);
+        }
+        .coverage-legend {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .coverage-legend span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .legend-dot.primary { background: var(--accent); }
+        .legend-dot.secondary { background: var(--accent-light); border: 1px solid var(--accent); }
+        .legend-dot.none { background: var(--bg-elevated); border: 1px solid var(--border); }
+
         .week-block { margin-bottom: 20px; }
         .week-header {
             display: flex; justify-content: space-between; align-items: baseline;
@@ -420,14 +479,18 @@
             <!-- EXERCISES -->
             <div id="exercises-page" class="page"><div class="page-inner exercises-grid">
                 <div class="card">
-                    <div class="card-title"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add Exercise</div>
+                    <div class="card-title" id="exercise-form-title"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add Exercise</div>
                     <form id="add-exercise-form">
+                        <input type="hidden" id="edit-exercise-id" value="">
                         <div class="form-group"><label class="form-label">Muscle Group</label>
                             <select id="new-muscle-group" required><option value="">Select…</option><option value="QUADS">Quads</option><option value="HAMSTRINGS">Hamstrings</option><option value="GLUTES">Glutes</option><option value="CHEST">Chest</option><option value="BACK">Back</option><option value="SHOULDERS">Shoulders</option><option value="BICEPS">Biceps</option><option value="TRICEPS">Triceps</option><option value="CALVES">Calves</option><option value="TRAPS">Traps</option><option value="ABS">Abs</option><option value="FOREARMS">Forearms</option><option value="NECK">Neck</option><option value="CARDIO">Cardio</option><option value="OTHER">Other</option></select>
                         </div>
                         <div class="form-group"><label class="form-label">Exercise Name</label><input type="text" id="new-exercise-name" required placeholder="e.g., Bulgarian Split Squat"></div>
                         <div class="form-group"><label class="form-label">Equipment</label><input type="text" id="new-equipment-type" required placeholder="e.g., Dumbbells, Machine"></div>
-                        <button type="submit" class="btn btn-primary">Add Exercise</button>
+                        <div class="form-group"><label class="form-label">Primary Muscles <span style="color:var(--text-muted);font-weight:400;">(comma separated)</span></label><input type="text" id="new-primary-muscles" placeholder="e.g., Quads, Glutes"></div>
+                        <div class="form-group"><label class="form-label">Secondary Muscles <span style="color:var(--text-muted);font-weight:400;">(comma separated)</span></label><input type="text" id="new-secondary-muscles" placeholder="e.g., Hamstrings, Core"></div>
+                        <button type="submit" class="btn btn-primary" id="exercise-submit-btn">Add Exercise</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-edit-btn" style="display:none;margin-top:8px;" onclick="cancelExerciseEdit()">Cancel Edit</button>
                     </form>
                 </div>
                 <div class="card">
@@ -549,36 +612,36 @@
 
     // ═══ Default Exercises ═══
     const defaultExercises = [
-        {muscle: "QUADS", name: "Squat", equipment: "Barbell"},
-        {muscle: "QUADS", name: "Squat (lighter)", equipment: "Barbell"},
-        {muscle: "QUADS", name: "Leg Press", equipment: "Machine"},
-        {muscle: "QUADS", name: "Leg Extension", equipment: "Machine"},
-        {muscle: "QUADS", name: "Walking Lunge", equipment: "Dumbbells"},
-        {muscle: "HAMSTRINGS", name: "Romanian Deadlift", equipment: "Barbell"},
-        {muscle: "HAMSTRINGS", name: "Deadlift", equipment: "Barbell"},
-        {muscle: "HAMSTRINGS", name: "Seated Leg Curl", equipment: "Machine"},
-        {muscle: "GLUTES", name: "Nautilus Glute Drive", equipment: "Machine"},
-        {muscle: "CHEST", name: "Bench Press", equipment: "Barbell"},
-        {muscle: "CHEST", name: "Incline Bench Press", equipment: "Barbell"},
-        {muscle: "CHEST", name: "Incline Bench Press", equipment: "Dumbell"},
-        {muscle: "CHEST", name: "Weighted Dips", equipment: "Bodyweight + Weight"},
-        {muscle: "CHEST", name: "Machine Pec Deck", equipment: "Machine"},
-        {muscle: "BACK", name: "Chest Supp. T-Bar", equipment: "Machine"},
-        {muscle: "BACK", name: "Pull Up", equipment: "Bodyweight + Weight"},
-        {muscle: "BACK", name: "One-armed Row", equipment: "Dumbell"},
-        {muscle: "SHOULDERS", name: "Overhead Press", equipment: "Barbell"},
-        {muscle: "SHOULDERS", name: "Overhead Press", equipment: "Dumbbells"},
-        {muscle: "SHOULDERS", name: "Lateral Raise", equipment: "Cable"},
-        {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Machine"},
-        {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Cable"},
-        {muscle: "BICEPS", name: "Bayesian Cable Curl", equipment: "Cable"},
-        {muscle: "BICEPS", name: "Preacher Curl", equipment: "EZ Bar/Dumbbells"},
-        {muscle: "TRICEPS", name: "Ovrhd Cable Tri Ex.", equipment: "Cable"},
-        {muscle: "CALVES", name: "Standing Calf Raise", equipment: "Machine"},
-        {muscle: "TRAPS", name: "Dumbbell Shrugs", equipment: "Dumbbells"},
-        {muscle: "ABS", name: "Cable Crunch", equipment: "Cable"},
-        {muscle: "FOREARMS", name: "Dumbbell Wrist Curls/Extensions", equipment: "Dumbbells"},
-        {muscle: "NECK", name: "Neck Curls/Extensions", equipment: "Plate/Harness"}
+        {muscle: "QUADS", name: "Squat", equipment: "Barbell", primary: ["Quads"], secondary: ["Glutes", "Hamstrings", "Core"]},
+        {muscle: "QUADS", name: "Squat (lighter)", equipment: "Barbell", primary: ["Quads"], secondary: ["Glutes", "Hamstrings", "Core"]},
+        {muscle: "QUADS", name: "Leg Press", equipment: "Machine", primary: ["Quads"], secondary: ["Glutes", "Hamstrings"]},
+        {muscle: "QUADS", name: "Leg Extension", equipment: "Machine", primary: ["Quads"], secondary: []},
+        {muscle: "QUADS", name: "Walking Lunge", equipment: "Dumbbells", primary: ["Quads"], secondary: ["Glutes", "Hamstrings"]},
+        {muscle: "HAMSTRINGS", name: "Romanian Deadlift", equipment: "Barbell", primary: ["Hamstrings"], secondary: ["Glutes", "Lower Back"]},
+        {muscle: "HAMSTRINGS", name: "Deadlift", equipment: "Barbell", primary: ["Hamstrings", "Back"], secondary: ["Glutes", "Quads", "Traps", "Core"]},
+        {muscle: "HAMSTRINGS", name: "Seated Leg Curl", equipment: "Machine", primary: ["Hamstrings"], secondary: []},
+        {muscle: "GLUTES", name: "Nautilus Glute Drive", equipment: "Machine", primary: ["Glutes"], secondary: ["Hamstrings"]},
+        {muscle: "CHEST", name: "Bench Press", equipment: "Barbell", primary: ["Chest"], secondary: ["Front Delts", "Triceps"]},
+        {muscle: "CHEST", name: "Incline Bench Press", equipment: "Barbell", primary: ["Upper Chest"], secondary: ["Front Delts", "Triceps"]},
+        {muscle: "CHEST", name: "Incline Bench Press", equipment: "Dumbell", primary: ["Upper Chest"], secondary: ["Front Delts", "Triceps"]},
+        {muscle: "CHEST", name: "Weighted Dips", equipment: "Bodyweight + Weight", primary: ["Chest", "Triceps"], secondary: ["Front Delts"]},
+        {muscle: "CHEST", name: "Machine Pec Deck", equipment: "Machine", primary: ["Chest"], secondary: []},
+        {muscle: "BACK", name: "Chest Supp. T-Bar", equipment: "Machine", primary: ["Lats", "Mid Back"], secondary: ["Biceps", "Rear Delts"]},
+        {muscle: "BACK", name: "Pull Up", equipment: "Bodyweight + Weight", primary: ["Lats"], secondary: ["Biceps", "Rear Delts", "Core"]},
+        {muscle: "BACK", name: "One-armed Row", equipment: "Dumbell", primary: ["Lats", "Mid Back"], secondary: ["Biceps", "Rear Delts"]},
+        {muscle: "SHOULDERS", name: "Overhead Press", equipment: "Barbell", primary: ["Front Delts"], secondary: ["Side Delts", "Triceps", "Upper Chest"]},
+        {muscle: "SHOULDERS", name: "Overhead Press", equipment: "Dumbbells", primary: ["Front Delts"], secondary: ["Side Delts", "Triceps"]},
+        {muscle: "SHOULDERS", name: "Lateral Raise", equipment: "Cable", primary: ["Side Delts"], secondary: []},
+        {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Machine", primary: ["Rear Delts"], secondary: ["Mid Back", "Traps"]},
+        {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Cable", primary: ["Rear Delts"], secondary: ["Mid Back", "Traps"]},
+        {muscle: "BICEPS", name: "Bayesian Cable Curl", equipment: "Cable", primary: ["Biceps"], secondary: []},
+        {muscle: "BICEPS", name: "Preacher Curl", equipment: "EZ Bar/Dumbbells", primary: ["Biceps"], secondary: []},
+        {muscle: "TRICEPS", name: "Ovrhd Cable Tri Ex.", equipment: "Cable", primary: ["Triceps"], secondary: []},
+        {muscle: "CALVES", name: "Standing Calf Raise", equipment: "Machine", primary: ["Calves"], secondary: []},
+        {muscle: "TRAPS", name: "Dumbbell Shrugs", equipment: "Dumbbells", primary: ["Traps"], secondary: []},
+        {muscle: "ABS", name: "Cable Crunch", equipment: "Cable", primary: ["Abs"], secondary: []},
+        {muscle: "FOREARMS", name: "Dumbbell Wrist Curls/Extensions", equipment: "Dumbbells", primary: ["Forearms"], secondary: []},
+        {muscle: "NECK", name: "Neck Curls/Extensions", equipment: "Plate/Harness", primary: ["Neck"], secondary: []}
     ];
 
     let exercises = [...defaultExercises];
@@ -770,16 +833,86 @@
         populateExerciseDropdown(this.value);
     });
 
-    // ═══ Add Custom Exercise ═══
+    // ═══ Add/Edit Custom Exercise ═══
     document.getElementById('add-exercise-form').addEventListener('submit', async function(e) {
         e.preventDefault();
+        const editId = document.getElementById('edit-exercise-id').value;
         const muscle = document.getElementById('new-muscle-group').value;
         const name = document.getElementById('new-exercise-name').value.trim();
         const equipment = document.getElementById('new-equipment-type').value.trim();
-        if (exercises.some(ex => ex.name.toLowerCase() === name.toLowerCase() && ex.equipment.toLowerCase() === equipment.toLowerCase())) { showToast('Exercise already exists!', 'error'); return; }
-        const saved = await saveCustomExercise({ muscle, name, equipment });
-        if (saved) { await loadCustomExercises(); renderExercisesList(); this.reset(); showToast('Exercise added!'); }
+        const primaryStr = document.getElementById('new-primary-muscles').value.trim();
+        const secondaryStr = document.getElementById('new-secondary-muscles').value.trim();
+        
+        const primary = primaryStr ? primaryStr.split(',').map(s => s.trim()).filter(s => s) : [];
+        const secondary = secondaryStr ? secondaryStr.split(',').map(s => s.trim()).filter(s => s) : [];
+        
+        // Check for duplicates (but allow if editing the same exercise)
+        const duplicate = exercises.find(ex => ex.name.toLowerCase() === name.toLowerCase() && ex.equipment.toLowerCase() === equipment.toLowerCase());
+        if (duplicate && (!editId || duplicate.id !== editId)) { 
+            showToast('Exercise already exists!', 'error'); 
+            return; 
+        }
+        
+        if (editId) {
+            // Update existing exercise
+            const updated = await updateCustomExercise(editId, { muscle, name, equipment, primary, secondary });
+            if (updated) { 
+                await loadCustomExercises(); 
+                renderExercisesList(); 
+                populateExerciseDropdown();
+                populateGoalExerciseDropdown();
+                cancelExerciseEdit();
+                showToast('Exercise updated!'); 
+            }
+        } else {
+            // Add new exercise
+            const saved = await saveCustomExercise({ muscle, name, equipment, primary, secondary });
+            if (saved) { 
+                await loadCustomExercises(); 
+                renderExercisesList(); 
+                populateExerciseDropdown();
+                populateGoalExerciseDropdown();
+                this.reset(); 
+                showToast('Exercise added!'); 
+            }
+        }
     });
+    
+    function editExercise(ex) {
+        document.getElementById('edit-exercise-id').value = ex.id;
+        document.getElementById('new-muscle-group').value = ex.muscle;
+        document.getElementById('new-exercise-name').value = ex.name;
+        document.getElementById('new-equipment-type').value = ex.equipment;
+        document.getElementById('new-primary-muscles').value = (ex.primary || []).join(', ');
+        document.getElementById('new-secondary-muscles').value = (ex.secondary || []).join(', ');
+        
+        document.getElementById('exercise-form-title').innerHTML = '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit Exercise';
+        document.getElementById('exercise-submit-btn').textContent = 'Save Changes';
+        document.getElementById('cancel-edit-btn').style.display = 'block';
+        
+        // Scroll to form
+        document.getElementById('add-exercise-form').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function cancelExerciseEdit() {
+        document.getElementById('edit-exercise-id').value = '';
+        document.getElementById('add-exercise-form').reset();
+        document.getElementById('exercise-form-title').innerHTML = '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add Exercise';
+        document.getElementById('exercise-submit-btn').textContent = 'Add Exercise';
+        document.getElementById('cancel-edit-btn').style.display = 'none';
+    }
+    
+    async function updateCustomExercise(id, data) {
+        if (!db) { showToast('Database error.', 'error'); return false; }
+        try {
+            await db.collection('customExercises').doc(id).update(data);
+            return true;
+        } catch (e) {
+            console.error('Error updating exercise:', e);
+            showToast('Error updating exercise.', 'error');
+            return false;
+        }
+    }
 
     // ═══ Exercises List ═══
     function renderExercisesList() {
@@ -791,7 +924,27 @@
             if (searchTerm && !ex.name.toLowerCase().includes(searchTerm) && !ex.equipment.toLowerCase().includes(searchTerm) && !ex.muscle.toLowerCase().includes(searchTerm)) return;
             if (currentMuscle !== ex.muscle) { currentMuscle = ex.muscle; html += `<div class="muscle-header">${ex.muscle}</div>`; }
             const isCustom = !defaultExercises.some(def => def.name === ex.name && def.equipment === ex.equipment);
-            html += `<div class="exercise-list-item"><div><div class="exercise-list-name">${ex.name}</div><div class="exercise-list-details"><span class="tag tag-equipment">${ex.equipment}</span>${isCustom ? '<span class="tag tag-custom">Custom</span>' : ''}</div></div>${isCustom && ex.id ? `<button class="btn btn-danger btn-sm" onclick="removeExercise('${ex.id}')">Delete</button>` : ''}</div>`;
+            
+            // Build muscle targets info
+            let muscleInfo = '';
+            if (ex.primary && ex.primary.length > 0) {
+                muscleInfo += `<div style="font-size:10px;margin-top:4px;"><span style="color:var(--text-muted);">Primary:</span> <span style="color:var(--accent);">${ex.primary.join(', ')}</span></div>`;
+            }
+            if (ex.secondary && ex.secondary.length > 0) {
+                muscleInfo += `<div style="font-size:10px;"><span style="color:var(--text-muted);">Secondary:</span> <span style="color:var(--text-secondary);">${ex.secondary.join(', ')}</span></div>`;
+            }
+            
+            html += `<div class="exercise-list-item">
+                <div>
+                    <div class="exercise-list-name">${ex.name}</div>
+                    <div class="exercise-list-details"><span class="tag tag-equipment">${ex.equipment}</span>${isCustom ? '<span class="tag tag-custom">Custom</span>' : ''}</div>
+                    ${muscleInfo}
+                </div>
+                <div style="display:flex;gap:6px;">
+                    ${isCustom && ex.id ? `<button class="btn btn-secondary btn-sm" onclick='editExercise(${JSON.stringify(ex).replace(/'/g, "&#39;")})'>Edit</button>` : ''}
+                    ${isCustom && ex.id ? `<button class="btn btn-danger btn-sm" onclick="removeExercise('${ex.id}')">Delete</button>` : ''}
+                </div>
+            </div>`;
         });
         container.innerHTML = html || '<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-text">No exercises found</div></div>';
     }
@@ -955,9 +1108,20 @@
             const latest = sorted[sorted.length - 1];
             const maxWeight = Math.max(...sorted.map(d => d.weight));
             const cardId = `card-${exercise.name}-${exercise.equipment}`.replace(/[^a-zA-Z0-9-]/g, '-');
+            
+            // Build muscle targets HTML
+            let muscleTargetsHtml = '';
+            if (exercise.primary && exercise.primary.length > 0) {
+                muscleTargetsHtml += '<div style="margin-top:6px;font-size:11px;"><span style="color:var(--text-muted);">Primary:</span> <span style="color:var(--accent);font-weight:600;">' + exercise.primary.join(', ') + '</span></div>';
+            }
+            if (exercise.secondary && exercise.secondary.length > 0) {
+                muscleTargetsHtml += '<div style="font-size:11px;"><span style="color:var(--text-muted);">Secondary:</span> <span style="color:var(--text-secondary);">' + exercise.secondary.join(', ') + '</span></div>';
+            }
+            
             card.innerHTML = `
                 <div class="exercise-card-header"><div class="exercise-card-name">${exercise.name}</div><button class="btn btn-secondary btn-sm" onclick="toggleEntries('${cardId}')">${exerciseData.length} entries</button></div>
                 <div style="margin-bottom:4px;"><span class="tag tag-equipment">${exercise.equipment}</span>${latest.weight >= maxWeight ? ' <span class="tag tag-pr">PR</span>' : ''}</div>
+                ${muscleTargetsHtml}
                 <div class="exercise-card-latest">Latest: <strong>${latest.weight} lbs × ${latest.reps}</strong> &nbsp;${formatDate(latest.date)}</div>
                 <div id="${cardId}" class="entry-list">
                     ${[...sorted].reverse().map(entry => `
@@ -1047,6 +1211,29 @@
                 return;
             }
 
+            // Calculate muscle coverage for last 7 days
+            const today = new Date();
+            const sevenDaysAgo = new Date(today);
+            sevenDaysAgo.setDate(today.getDate() - 7);
+            const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+            
+            const allMuscleGroups = ['Chest', 'Upper Chest', 'Back', 'Lats', 'Mid Back', 'Front Delts', 'Side Delts', 'Rear Delts', 'Biceps', 'Triceps', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Abs', 'Core', 'Traps', 'Forearms', 'Lower Back', 'Neck'];
+            const hitPrimary = new Set();
+            const hitSecondary = new Set();
+            
+            dates.forEach(dateStr => {
+                if (dateStr >= sevenDaysAgoStr) {
+                    byDate[dateStr].forEach(entry => {
+                        // Find the exercise in our list
+                        const ex = exercises.find(e => e.name === entry.exercise && e.equipment === entry.equipment);
+                        if (ex) {
+                            if (ex.primary) ex.primary.forEach(m => hitPrimary.add(m));
+                            if (ex.secondary) ex.secondary.forEach(m => { if (!hitPrimary.has(m)) hitSecondary.add(m); });
+                        }
+                    });
+                }
+            });
+
             const fmtDay = function(dateStr) {
                 try {
                     const dt = new Date(dateStr + 'T12:00:00');
@@ -1061,7 +1248,27 @@
                 } catch(err) { return dateStr; }
             };
 
-            var html = '<div class="history-days-grid">';
+            // Build muscle coverage summary HTML
+            var html = '<div class="muscle-coverage-summary">';
+            html += '<div class="coverage-title">Muscle Coverage (Last 7 Days)</div>';
+            html += '<div class="coverage-grid">';
+            allMuscleGroups.forEach(m => {
+                if (hitPrimary.has(m)) {
+                    html += '<span class="coverage-tag hit-primary">' + m + '</span>';
+                } else if (hitSecondary.has(m)) {
+                    html += '<span class="coverage-tag hit-secondary">' + m + '</span>';
+                } else {
+                    html += '<span class="coverage-tag not-hit">' + m + '</span>';
+                }
+            });
+            html += '</div>';
+            html += '<div class="coverage-legend">';
+            html += '<span><span class="legend-dot primary"></span> Primary</span>';
+            html += '<span><span class="legend-dot secondary"></span> Secondary</span>';
+            html += '<span><span class="legend-dot none"></span> Not Hit</span>';
+            html += '</div></div>';
+
+            html += '<div class="history-days-grid">';
 
             for (var i = 0; i < dates.length; i++) {
                 var dateStr = dates[i];

@@ -640,15 +640,15 @@
         {muscle: "CHEST", name: "Weighted Dips", equipment: "Bodyweight + Weight", primary: ["Chest", "Triceps"], secondary: ["Front Delts"]},
         {muscle: "CHEST", name: "Machine Pec Deck", equipment: "Machine", primary: ["Chest"], secondary: []},
         // BACK
-        {muscle: "BACK", name: "Chest Supp. T-Bar", equipment: "Machine", primary: ["Lats", "Mid Back"], secondary: ["Biceps", "Rear Delts"]},
+        {muscle: "BACK", name: "Chest Supp. T-Bar", equipment: "Machine", primary: ["Lats", "Rhomboids"], secondary: ["Biceps", "Rear Delts", "Traps"]},
         {muscle: "BACK", name: "Pull Up", equipment: "Bodyweight + Weight", primary: ["Lats"], secondary: ["Biceps", "Rear Delts", "Core"]},
-        {muscle: "BACK", name: "One-armed Row", equipment: "Dumbell", primary: ["Lats", "Mid Back"], secondary: ["Biceps", "Rear Delts"]},
+        {muscle: "BACK", name: "One-armed Row", equipment: "Dumbell", primary: ["Lats", "Rhomboids"], secondary: ["Biceps", "Rear Delts", "Traps"]},
         // SHOULDERS
         {muscle: "SHOULDERS", name: "Overhead Press", equipment: "Barbell", primary: ["Front Delts"], secondary: ["Side Delts", "Triceps", "Upper Chest"]},
         {muscle: "SHOULDERS", name: "Overhead Press", equipment: "Dumbbells", primary: ["Front Delts"], secondary: ["Side Delts", "Triceps"]},
         {muscle: "SHOULDERS", name: "Lateral Raise", equipment: "Cable", primary: ["Side Delts"], secondary: []},
-        {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Machine", primary: ["Rear Delts"], secondary: ["Mid Back", "Traps"]},
-        {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Cable", primary: ["Rear Delts"], secondary: ["Mid Back", "Traps"]},
+        {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Machine", primary: ["Rear Delts"], secondary: ["Rhomboids", "Traps"]},
+        {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Cable", primary: ["Rear Delts"], secondary: ["Rhomboids", "Traps"]},
         // BICEPS
         {muscle: "BICEPS", name: "Bayesian Cable Curl", equipment: "Cable", primary: ["Biceps"], secondary: ["Forearms"]},
         {muscle: "BICEPS", name: "Preacher Curl", equipment: "EZ Bar/Dumbbells", primary: ["Biceps"], secondary: ["Forearms"]},
@@ -814,7 +814,32 @@
     // ═══ Custom Exercises ═══
     async function loadCustomExercises() {
         if (!db) return;
-        try { const s = await db.collection('customExercises').get(); const c = []; s.forEach(doc => { c.push({ id: doc.id, ...doc.data() }); }); exercises = [...defaultExercises, ...c]; populateExerciseDropdown(); populateGoalExerciseDropdown(); } catch (e) { console.error('Error loading custom exercises:', e); }
+        try { 
+            const s = await db.collection('customExercises').get(); 
+            const customData = []; 
+            s.forEach(doc => { customData.push({ id: doc.id, ...doc.data() }); }); 
+            
+            // Separate overrides and custom exercises
+            const overrides = customData.filter(ex => ex.isOverride);
+            const customs = customData.filter(ex => !ex.isOverride);
+            
+            // Start with defaults, applying any overrides
+            const mergedDefaults = defaultExercises.map(def => {
+                const overrideKey = `${def.name}|||${def.equipment}`;
+                const override = overrides.find(o => o.overrideKey === overrideKey);
+                if (override) {
+                    return { ...override, isCustom: false };
+                }
+                return { ...def, isCustom: false };
+            });
+            
+            // Add custom exercises (mark them as custom)
+            const markedCustoms = customs.map(c => ({ ...c, isCustom: true }));
+            
+            exercises = [...mergedDefaults, ...markedCustoms]; 
+            populateExerciseDropdown(); 
+            populateGoalExerciseDropdown(); 
+        } catch (e) { console.error('Error loading custom exercises:', e); }
     }
     async function saveCustomExercise(exercise) { if (!db) { showToast('Database error.', 'error'); return false; } try { await db.collection('customExercises').add(exercise); return true; } catch (e) { showToast('Error saving exercise.', 'error'); return false; } }
     async function deleteCustomExercise(id) { if (!db) { showToast('Database error.', 'error'); return false; } try { await db.collection('customExercises').doc(id).delete(); return true; } catch (e) { showToast('Error deleting exercise.', 'error'); return false; } }
@@ -961,7 +986,12 @@
     // ═══ Add/Edit Custom Exercise ═══
     document.getElementById('add-exercise-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        const editId = document.getElementById('edit-exercise-id').value;
+        const editIdField = document.getElementById('edit-exercise-id');
+        const editId = editIdField.value;
+        const isEditingDefault = editIdField.dataset.isDefault === 'true';
+        const originalName = editIdField.dataset.originalName;
+        const originalEquipment = editIdField.dataset.originalEquipment;
+        
         const muscle = document.getElementById('new-muscle-group').value;
         const name = document.getElementById('new-exercise-name').value.trim();
         const equipment = document.getElementById('new-equipment-type').value.trim();
@@ -973,14 +1003,17 @@
         
         // Check for duplicates (but allow if editing the same exercise)
         const duplicate = exercises.find(ex => ex.name.toLowerCase() === name.toLowerCase() && ex.equipment.toLowerCase() === equipment.toLowerCase());
-        if (duplicate && (!editId || duplicate.id !== editId)) { 
+        const isSameExercise = originalName && originalEquipment && 
+            originalName.toLowerCase() === name.toLowerCase() && 
+            originalEquipment.toLowerCase() === equipment.toLowerCase();
+        if (duplicate && !isSameExercise && (!editId || duplicate.id !== editId)) { 
             showToast('Exercise already exists!', 'error'); 
             return; 
         }
         
-        if (editId) {
-            // Update existing exercise
-            const updated = await updateCustomExercise(editId, { muscle, name, equipment, primary, secondary });
+        if (editId && !isEditingDefault) {
+            // Update existing custom exercise
+            const updated = await updateCustomExercise(editId, { muscle, name, equipment, primary, secondary, isCustom: true });
             if (updated) { 
                 await loadCustomExercises(); 
                 renderExercisesList(); 
@@ -989,9 +1022,48 @@
                 cancelExerciseEdit();
                 showToast('Exercise updated!'); 
             }
+        } else if (isEditingDefault) {
+            // Editing a default exercise - save as override
+            // First check if an override already exists
+            const existingOverride = exercises.find(ex => 
+                ex.isOverride && 
+                ex.overrideKey === `${originalName}|||${originalEquipment}`
+            );
+            
+            if (existingOverride && existingOverride.id) {
+                // Update existing override
+                const updated = await updateCustomExercise(existingOverride.id, { 
+                    muscle, name, equipment, primary, secondary, 
+                    isOverride: true,
+                    overrideKey: `${originalName}|||${originalEquipment}`
+                });
+                if (updated) { 
+                    await loadCustomExercises(); 
+                    renderExercisesList(); 
+                    populateExerciseDropdown();
+                    populateGoalExerciseDropdown();
+                    cancelExerciseEdit();
+                    showToast('Exercise updated!'); 
+                }
+            } else {
+                // Create new override
+                const saved = await saveCustomExercise({ 
+                    muscle, name, equipment, primary, secondary, 
+                    isOverride: true,
+                    overrideKey: `${originalName}|||${originalEquipment}`
+                });
+                if (saved) { 
+                    await loadCustomExercises(); 
+                    renderExercisesList(); 
+                    populateExerciseDropdown();
+                    populateGoalExerciseDropdown();
+                    cancelExerciseEdit();
+                    showToast('Exercise updated!'); 
+                }
+            }
         } else {
-            // Add new exercise
-            const saved = await saveCustomExercise({ muscle, name, equipment, primary, secondary });
+            // Add new custom exercise
+            const saved = await saveCustomExercise({ muscle, name, equipment, primary, secondary, isCustom: true });
             if (saved) { 
                 await loadCustomExercises(); 
                 renderExercisesList(); 
@@ -1004,7 +1076,13 @@
     });
     
     function editExercise(ex) {
-        document.getElementById('edit-exercise-id').value = ex.id;
+        // Store whether this is a default exercise being edited
+        const isDefault = !ex.isCustom;
+        document.getElementById('edit-exercise-id').value = ex.id || '';
+        document.getElementById('edit-exercise-id').dataset.isDefault = isDefault ? 'true' : 'false';
+        document.getElementById('edit-exercise-id').dataset.originalName = ex.name;
+        document.getElementById('edit-exercise-id').dataset.originalEquipment = ex.equipment;
+        
         document.getElementById('new-muscle-group').value = ex.muscle;
         document.getElementById('new-exercise-name').value = ex.name;
         document.getElementById('new-equipment-type').value = ex.equipment;
@@ -1021,6 +1099,9 @@
     
     function cancelExerciseEdit() {
         document.getElementById('edit-exercise-id').value = '';
+        document.getElementById('edit-exercise-id').dataset.isDefault = '';
+        document.getElementById('edit-exercise-id').dataset.originalName = '';
+        document.getElementById('edit-exercise-id').dataset.originalEquipment = '';
         document.getElementById('add-exercise-form').reset();
         document.getElementById('exercise-form-title').innerHTML = '<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add Exercise';
         document.getElementById('exercise-submit-btn').textContent = 'Add Exercise';
@@ -1048,7 +1129,7 @@
         sorted.forEach(ex => {
             if (searchTerm && !ex.name.toLowerCase().includes(searchTerm) && !ex.equipment.toLowerCase().includes(searchTerm) && !ex.muscle.toLowerCase().includes(searchTerm)) return;
             if (currentMuscle !== ex.muscle) { currentMuscle = ex.muscle; html += `<div class="muscle-header">${ex.muscle}</div>`; }
-            const isCustom = !defaultExercises.some(def => def.name === ex.name && def.equipment === ex.equipment);
+            const isCustom = ex.isCustom === true;
             
             // Build muscle targets info
             let muscleInfo = '';
@@ -1066,7 +1147,7 @@
                     ${muscleInfo}
                 </div>
                 <div style="display:flex;gap:6px;">
-                    ${isCustom && ex.id ? `<button class="btn btn-secondary btn-sm" onclick='editExercise(${JSON.stringify(ex).replace(/'/g, "&#39;")})'>Edit</button>` : ''}
+                    <button class="btn btn-secondary btn-sm" onclick='editExercise(${JSON.stringify(ex).replace(/'/g, "&#39;")})'>Edit</button>
                     ${isCustom && ex.id ? `<button class="btn btn-danger btn-sm" onclick="removeExercise('${ex.id}')">Delete</button>` : ''}
                 </div>
             </div>`;
@@ -1084,22 +1165,25 @@
 
     // ═══ Export/Import Exercises ═══
     function exportExercises() {
-        // Get only custom exercises
-        const customExercises = exercises.filter(ex => !defaultExercises.some(def => def.name === ex.name && def.equipment === ex.equipment));
+        // Export all exercises that are stored in Firebase (custom + modified defaults)
+        // We can identify these as exercises with isCustom:true OR exercises with an id (overrides)
+        const exportableExercises = exercises.filter(ex => ex.isCustom || ex.id);
         
-        if (customExercises.length === 0) {
-            showToast('No custom exercises to export.', 'info');
+        if (exportableExercises.length === 0) {
+            showToast('No exercises to export.', 'info');
             return;
         }
         
-        // Create CSV content
-        const headers = ['muscle', 'name', 'equipment', 'primary', 'secondary'];
-        const rows = customExercises.map(ex => [
+        // Create CSV content - include type column to distinguish custom vs override
+        const headers = ['type', 'muscle', 'name', 'equipment', 'primary', 'secondary', 'overrideKey'];
+        const rows = exportableExercises.map(ex => [
+            ex.isCustom ? 'custom' : 'override',
             ex.muscle || '',
             ex.name || '',
             ex.equipment || '',
             (ex.primary || []).join('; '),
-            (ex.secondary || []).join('; ')
+            (ex.secondary || []).join('; '),
+            ex.overrideKey || ''
         ]);
         
         const csvContent = [headers.join(','), ...rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(','))].join('\n');
@@ -1108,10 +1192,10 @@
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `custom-exercises-${new Date().toISOString().split('T')[0]}.csv`;
+        link.download = `exercises-${new Date().toISOString().split('T')[0]}.csv`;
         link.click();
         
-        showToast(`Exported ${customExercises.length} exercises!`);
+        showToast(`Exported ${exportableExercises.length} exercises!`);
     }
     
     async function importExercises(event) {
@@ -1131,18 +1215,20 @@
                 
                 // Parse header
                 const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, ''));
+                const typeIdx = headers.indexOf('type');
                 const muscleIdx = headers.indexOf('muscle');
                 const nameIdx = headers.indexOf('name');
                 const equipmentIdx = headers.indexOf('equipment');
                 const primaryIdx = headers.indexOf('primary');
                 const secondaryIdx = headers.indexOf('secondary');
+                const overrideKeyIdx = headers.indexOf('overridekey');
                 
                 if (nameIdx === -1 || equipmentIdx === -1) {
                     showToast('CSV must have "name" and "equipment" columns.', 'error');
                     return;
                 }
                 
-                let imported = 0, skipped = 0;
+                let imported = 0, updated = 0, skipped = 0;
                 
                 for (let i = 1; i < lines.length; i++) {
                     // Parse CSV line (handle quoted values)
@@ -1156,16 +1242,12 @@
                     }
                     row.push(current.trim());
                     
+                    const type = typeIdx !== -1 ? row[typeIdx]?.replace(/"/g, '').trim().toLowerCase() : 'custom';
                     const name = row[nameIdx]?.replace(/"/g, '').trim();
                     const equipment = row[equipmentIdx]?.replace(/"/g, '').trim();
+                    const overrideKey = overrideKeyIdx !== -1 ? row[overrideKeyIdx]?.replace(/"/g, '').trim() : '';
                     
                     if (!name || !equipment) continue;
-                    
-                    // Check if already exists
-                    if (exercises.some(ex => ex.name.toLowerCase() === name.toLowerCase() && ex.equipment.toLowerCase() === equipment.toLowerCase())) {
-                        skipped++;
-                        continue;
-                    }
                     
                     const muscle = muscleIdx !== -1 ? row[muscleIdx]?.replace(/"/g, '').trim().toUpperCase() : 'OTHER';
                     const primaryStr = primaryIdx !== -1 ? row[primaryIdx]?.replace(/"/g, '').trim() : '';
@@ -1174,8 +1256,29 @@
                     const primary = primaryStr ? primaryStr.split(';').map(s => s.trim()).filter(s => s) : [];
                     const secondary = secondaryStr ? secondaryStr.split(';').map(s => s.trim()).filter(s => s) : [];
                     
-                    const saved = await saveCustomExercise({ muscle, name, equipment, primary, secondary });
-                    if (saved) imported++;
+                    if (type === 'override' && overrideKey) {
+                        // This is an override for a default exercise
+                        const existingOverride = exercises.find(ex => ex.isOverride && ex.overrideKey === overrideKey);
+                        if (existingOverride && existingOverride.id) {
+                            // Update existing override
+                            await updateCustomExercise(existingOverride.id, { muscle, name, equipment, primary, secondary, isOverride: true, overrideKey });
+                            updated++;
+                        } else {
+                            // Create new override
+                            await saveCustomExercise({ muscle, name, equipment, primary, secondary, isOverride: true, overrideKey });
+                            imported++;
+                        }
+                    } else {
+                        // Custom exercise - check if already exists
+                        const existing = exercises.find(ex => ex.name.toLowerCase() === name.toLowerCase() && ex.equipment.toLowerCase() === equipment.toLowerCase());
+                        if (existing) {
+                            skipped++;
+                            continue;
+                        }
+                        
+                        const saved = await saveCustomExercise({ muscle, name, equipment, primary, secondary, isCustom: true });
+                        if (saved) imported++;
+                    }
                 }
                 
                 await loadCustomExercises();
@@ -1184,6 +1287,7 @@
                 populateGoalExerciseDropdown();
                 
                 let msg = `Imported ${imported} exercises!`;
+                if (updated > 0) msg += ` Updated ${updated}.`;
                 if (skipped > 0) msg += ` (${skipped} duplicates skipped)`;
                 showToast(msg);
                 

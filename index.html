@@ -621,35 +621,48 @@
 
     // ═══ Default Exercises ═══
     const defaultExercises = [
-        {muscle: "QUADS", name: "Squat", equipment: "Barbell", primary: ["Quads"], secondary: ["Glutes", "Hamstrings", "Core"]},
-        {muscle: "QUADS", name: "Squat (lighter)", equipment: "Barbell", primary: ["Quads"], secondary: ["Glutes", "Hamstrings", "Core"]},
+        // QUADS
+        {muscle: "QUADS", name: "Squat", equipment: "Barbell", primary: ["Quads", "Glutes"], secondary: ["Hamstrings", "Lower Back", "Core"]},
+        {muscle: "QUADS", name: "Squat (lighter)", equipment: "Barbell", primary: ["Quads", "Glutes"], secondary: ["Hamstrings", "Lower Back", "Core"]},
         {muscle: "QUADS", name: "Leg Press", equipment: "Machine", primary: ["Quads"], secondary: ["Glutes", "Hamstrings"]},
         {muscle: "QUADS", name: "Leg Extension", equipment: "Machine", primary: ["Quads"], secondary: []},
-        {muscle: "QUADS", name: "Walking Lunge", equipment: "Dumbbells", primary: ["Quads"], secondary: ["Glutes", "Hamstrings"]},
-        {muscle: "HAMSTRINGS", name: "Romanian Deadlift", equipment: "Barbell", primary: ["Hamstrings"], secondary: ["Glutes", "Lower Back"]},
-        {muscle: "HAMSTRINGS", name: "Deadlift", equipment: "Barbell", primary: ["Hamstrings", "Back"], secondary: ["Glutes", "Quads", "Traps", "Core"]},
+        {muscle: "QUADS", name: "Walking Lunge", equipment: "Dumbbells", primary: ["Quads", "Glutes"], secondary: ["Hamstrings", "Core"]},
+        // HAMSTRINGS
+        {muscle: "HAMSTRINGS", name: "Romanian Deadlift", equipment: "Barbell", primary: ["Hamstrings", "Glutes"], secondary: ["Lower Back", "Core"]},
+        {muscle: "HAMSTRINGS", name: "Deadlift", equipment: "Barbell", primary: ["Hamstrings", "Glutes", "Lower Back"], secondary: ["Quads", "Lats", "Traps", "Core", "Forearms"]},
         {muscle: "HAMSTRINGS", name: "Seated Leg Curl", equipment: "Machine", primary: ["Hamstrings"], secondary: []},
+        // GLUTES
         {muscle: "GLUTES", name: "Nautilus Glute Drive", equipment: "Machine", primary: ["Glutes"], secondary: ["Hamstrings"]},
+        // CHEST
         {muscle: "CHEST", name: "Bench Press", equipment: "Barbell", primary: ["Chest"], secondary: ["Front Delts", "Triceps"]},
         {muscle: "CHEST", name: "Incline Bench Press", equipment: "Barbell", primary: ["Upper Chest"], secondary: ["Front Delts", "Triceps"]},
         {muscle: "CHEST", name: "Incline Bench Press", equipment: "Dumbell", primary: ["Upper Chest"], secondary: ["Front Delts", "Triceps"]},
         {muscle: "CHEST", name: "Weighted Dips", equipment: "Bodyweight + Weight", primary: ["Chest", "Triceps"], secondary: ["Front Delts"]},
         {muscle: "CHEST", name: "Machine Pec Deck", equipment: "Machine", primary: ["Chest"], secondary: []},
+        // BACK
         {muscle: "BACK", name: "Chest Supp. T-Bar", equipment: "Machine", primary: ["Lats", "Mid Back"], secondary: ["Biceps", "Rear Delts"]},
         {muscle: "BACK", name: "Pull Up", equipment: "Bodyweight + Weight", primary: ["Lats"], secondary: ["Biceps", "Rear Delts", "Core"]},
         {muscle: "BACK", name: "One-armed Row", equipment: "Dumbell", primary: ["Lats", "Mid Back"], secondary: ["Biceps", "Rear Delts"]},
+        // SHOULDERS
         {muscle: "SHOULDERS", name: "Overhead Press", equipment: "Barbell", primary: ["Front Delts"], secondary: ["Side Delts", "Triceps", "Upper Chest"]},
         {muscle: "SHOULDERS", name: "Overhead Press", equipment: "Dumbbells", primary: ["Front Delts"], secondary: ["Side Delts", "Triceps"]},
         {muscle: "SHOULDERS", name: "Lateral Raise", equipment: "Cable", primary: ["Side Delts"], secondary: []},
         {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Machine", primary: ["Rear Delts"], secondary: ["Mid Back", "Traps"]},
         {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Cable", primary: ["Rear Delts"], secondary: ["Mid Back", "Traps"]},
-        {muscle: "BICEPS", name: "Bayesian Cable Curl", equipment: "Cable", primary: ["Biceps"], secondary: []},
-        {muscle: "BICEPS", name: "Preacher Curl", equipment: "EZ Bar/Dumbbells", primary: ["Biceps"], secondary: []},
+        // BICEPS
+        {muscle: "BICEPS", name: "Bayesian Cable Curl", equipment: "Cable", primary: ["Biceps"], secondary: ["Forearms"]},
+        {muscle: "BICEPS", name: "Preacher Curl", equipment: "EZ Bar/Dumbbells", primary: ["Biceps"], secondary: ["Forearms"]},
+        // TRICEPS
         {muscle: "TRICEPS", name: "Ovrhd Cable Tri Ex.", equipment: "Cable", primary: ["Triceps"], secondary: []},
+        // CALVES
         {muscle: "CALVES", name: "Standing Calf Raise", equipment: "Machine", primary: ["Calves"], secondary: []},
-        {muscle: "TRAPS", name: "Dumbbell Shrugs", equipment: "Dumbbells", primary: ["Traps"], secondary: []},
+        // TRAPS
+        {muscle: "TRAPS", name: "Dumbbell Shrugs", equipment: "Dumbbells", primary: ["Traps"], secondary: ["Forearms"]},
+        // ABS
         {muscle: "ABS", name: "Cable Crunch", equipment: "Cable", primary: ["Abs"], secondary: []},
+        // FOREARMS
         {muscle: "FOREARMS", name: "Dumbbell Wrist Curls/Extensions", equipment: "Dumbbells", primary: ["Forearms"], secondary: []},
+        // NECK
         {muscle: "NECK", name: "Neck Curls/Extensions", equipment: "Plate/Harness", primary: ["Neck"], secondary: []}
     ];
 

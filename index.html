@@ -275,9 +275,34 @@
             font-size: 13px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 12px;
+            margin-bottom: 0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+        .coverage-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .coverage-days-dropdown {
+            width: auto;
+            padding: 4px 28px 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 20px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--accent-text);
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='%2364748b'%3E%3Cpath d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+        }
+        .coverage-days-dropdown:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
         }
         .coverage-grid {
             display: flex;
@@ -694,6 +719,7 @@
     }
 
     // ═══ Log Page Muscle Coverage ═══
+    var coverageDays = 7;
     function renderLogMuscleCoverage() {
         const container = document.getElementById('log-muscle-coverage');
         
@@ -702,11 +728,11 @@
             return;
         }
         
-        // Calculate muscle coverage for last 7 days
+        // Calculate muscle coverage for selected number of days
         const today = new Date();
-        const sevenDaysAgo = new Date(today);
-        sevenDaysAgo.setDate(today.getDate() - 7);
-        const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+        const cutoff = new Date(today);
+        cutoff.setDate(today.getDate() - coverageDays);
+        const cutoffStr = cutoff.toISOString().split('T')[0];
         
         // Dynamically build muscle groups from all exercises
         const allMuscleGroupsSet = new Set();
@@ -725,7 +751,7 @@
         const hitSecondary = new Set();
         
         workoutData.forEach(entry => {
-            if (entry.date && entry.date >= sevenDaysAgoStr) {
+            if (entry.date && entry.date >= cutoffStr) {
                 const ex = exercises.find(e => e.name === entry.exercise && e.equipment === entry.equipment);
                 if (ex) {
                     if (ex.primary) ex.primary.forEach(m => hitPrimary.add(m));
@@ -734,7 +760,13 @@
             }
         });
         
-        let html = '<div class="coverage-title">Muscle Coverage (Last 7 Days)</div>';
+        const dayLabel = coverageDays === 1 ? 'Last 1 Day' : 'Last ' + coverageDays + ' Days';
+        let html = '<div class="coverage-header-row"><div class="coverage-title">Muscle Coverage</div>';
+        html += '<select id="coverage-days-select" class="coverage-days-dropdown" onchange="coverageDays=parseInt(this.value);renderLogMuscleCoverage();">';
+        for (var i = 1; i <= 7; i++) {
+            html += '<option value="' + i + '"' + (i === coverageDays ? ' selected' : '') + '>' + (i === 1 ? '1 Day' : i + ' Days') + '</option>';
+        }
+        html += '</select></div>';
         html += '<div class="coverage-grid">';
         allMuscleGroups.forEach(m => {
             if (hitPrimary.has(m)) {
@@ -1554,11 +1586,11 @@
                 return;
             }
 
-            // Calculate muscle coverage for last 7 days
+            // Calculate muscle coverage for selected number of days
             const today = new Date();
-            const sevenDaysAgo = new Date(today);
-            sevenDaysAgo.setDate(today.getDate() - 7);
-            const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
+            const cutoff = new Date(today);
+            cutoff.setDate(today.getDate() - coverageDays);
+            const cutoffStr = cutoff.toISOString().split('T')[0];
             
             // Dynamically build muscle groups from all exercises
             const allMuscleGroupsSet = new Set();
@@ -1572,7 +1604,7 @@
             const hitSecondary = new Set();
             
             dates.forEach(dateStr => {
-                if (dateStr >= sevenDaysAgoStr) {
+                if (dateStr >= cutoffStr) {
                     byDate[dateStr].forEach(entry => {
                         // Find the exercise in our list
                         const ex = exercises.find(e => e.name === entry.exercise && e.equipment === entry.equipment);
@@ -1600,7 +1632,12 @@
 
             // Build muscle coverage summary HTML
             var html = '<div class="muscle-coverage-summary">';
-            html += '<div class="coverage-title">Muscle Coverage (Last 7 Days)</div>';
+            html += '<div class="coverage-header-row"><div class="coverage-title">Muscle Coverage</div>';
+            html += '<select class="coverage-days-dropdown" onchange="coverageDays=parseInt(this.value);renderLogMuscleCoverage();renderHistory();">';
+            for (var di = 1; di <= 7; di++) {
+                html += '<option value="' + di + '"' + (di === coverageDays ? ' selected' : '') + '>' + (di === 1 ? '1 Day' : di + ' Days') + '</option>';
+            }
+            html += '</select></div>';
             html += '<div class="coverage-grid">';
             allMuscleGroups.forEach(m => {
                 if (hitPrimary.has(m)) {

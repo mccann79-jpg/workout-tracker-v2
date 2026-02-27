@@ -200,20 +200,23 @@
         .today-card-stats { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--accent); text-align: right; }
         .today-card-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-        /* ─── Goals ─── */
-        .goal-card { background: var(--bg-card); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-        .goal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .goal-title { font-size: 16px; font-weight: 700; }
-        .goal-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-        .goal-stat { background: var(--bg-elevated); border-radius: var(--radius-sm); padding: 10px 12px; }
-        .goal-stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
-        .goal-stat-value { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--accent); margin-top: 2px; }
-        .goal-strategy { font-size: 12px; color: var(--accent-text); font-style: italic; margin-bottom: 12px; padding: 8px 12px; background: var(--accent-light); border-radius: var(--radius-sm); border-left: 3px solid var(--accent); }
-        .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: var(--bg-elevated); color: var(--text-secondary); padding: 9px 10px; text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
-        td { padding: 9px 10px; border-top: 1px solid var(--border); }
-        tr.week-complete td { background: var(--green-light); color: var(--green); }
+        /* ─── Balance ─── */
+        .balance-card { background: var(--bg-card); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+        .balance-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .balance-card-name { font-weight: 700; font-size: 14px; }
+        .balance-bar-track { height: 8px; background: var(--bg-elevated); border-radius: 4px; overflow: visible; margin: 8px 0; position: relative; }
+        .balance-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+        .balance-bar-target { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--text-primary); border-radius: 1px; }
+        .balance-stats-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); }
+        .balance-stats-row strong { font-family: var(--font-mono); font-size: 13px; }
+        .balance-pct { font-family: var(--font-mono); font-size: 15px; font-weight: 700; }
+        .balance-pct.over { color: var(--green); }
+        .balance-pct.balanced { color: var(--accent); }
+        .balance-pct.under { color: #ca8a04; }
+        .balance-pct.weak { color: var(--red); }
+        .balance-nodata { font-size: 12px; color: var(--text-muted); font-style: italic; }
+        .balance-category-disclaimer { font-size: 11px; color: var(--text-muted); padding: 8px 12px; background: var(--bg-elevated); border-radius: var(--radius-sm); margin-bottom: 12px; border-left: 3px solid #ca8a04; }
+        .balance-group-header { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
 
         /* ─── Exercise List ─── */
         .exercise-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: var(--bg-elevated); margin-bottom: 5px; border-radius: var(--radius-sm); }
@@ -398,7 +401,8 @@
             #progress-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
             #progress-container .muscle-header { grid-column: 1 / -1; }
             .chart-container { height: 200px; }
-            #goals-list-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+            #balance-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+            #balance-container .balance-group-header, #balance-container .balance-category-disclaimer { grid-column: 1 / -1; }
             .exercises-grid { display: grid; grid-template-columns: 360px 1fr; gap: 16px; align-items: start; }
             .data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
             .today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -417,11 +421,10 @@
             .header { padding: 12px 40px 14px; }
             #progress-container { grid-template-columns: 1fr 1fr 1fr; }
             .chart-container { height: 220px; }
-            #goals-list-container { grid-template-columns: 1fr 1fr 1fr; }
+            #balance-container { grid-template-columns: 1fr 1fr 1fr; }
             .exercises-grid { grid-template-columns: 400px 1fr; }
             .log-grid { grid-template-columns: minmax(360px, 460px) 1fr; }
             .today-grid { grid-template-columns: 1fr 1fr 1fr; }
-            .goal-stats { grid-template-columns: 1fr 1fr 1fr 1fr; }
         }
 
         /* ═══ Wide 1400px+ ═══ */
@@ -488,18 +491,34 @@
                 <div id="progress-container"></div>
             </div></div>
 
-            <!-- GOALS -->
-            <div id="goals-page" class="page"><div class="page-inner">
+            <!-- BALANCE -->
+            <div id="balance-page" class="page"><div class="page-inner">
                 <div class="card">
-                    <div class="card-title"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Set Goal</div>
-                    <form id="goal-form">
-                        <div class="form-group"><label class="form-label">Exercise</label><select id="goal-exercise-select" required><option value="">Select an exercise…</option></select></div>
-                        <div id="goal-current-info" style="display:none;" class="last-entry-bar"></div>
-                        <div class="form-group"><label class="form-label">Target Weight (lbs)</label><input type="number" id="goal-target-weight" step="0.5" placeholder="0" required inputmode="decimal"></div>
-                        <button type="submit" class="btn btn-primary"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Generate Plan</button>
-                    </form>
+                    <div class="card-title"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v15M5 8l7-5 7 5M4 8v2a1 1 0 001 1h4a1 1 0 001-1V8M14 8v2a1 1 0 001 1h4a1 1 0 001-1V8"/></svg> Strength Balance</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Compare your lifts to established strength ratios to find weak points.</div>
+                    <div class="form-group"><label class="form-label">Baseline Exercise</label><select id="balance-baseline-select"></select></div>
+                    <div id="balance-baseline-info" class="last-entry-bar" style="display:none;"></div>
                 </div>
-                <div id="goals-list-container"></div>
+                <div id="balance-score-card" class="card" style="display:none;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px;">Overall Balance</div>
+                            <div id="balance-score-value" style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--accent);"></div>
+                        </div>
+                        <div id="balance-score-label" style="font-size:13px;font-weight:600;padding:4px 12px;border-radius:20px;"></div>
+                    </div>
+                </div>
+                <div id="balance-filter-bar" style="display:none;margin-bottom:12px;">
+                    <select id="balance-category-filter" style="width:100%;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-size:13px;">
+                        <option value="">All Equipment</option>
+                        <option value="barbell">Barbell</option>
+                        <option value="dumbbell">Dumbbell</option>
+                        <option value="machine">Machine (approx.)</option>
+                        <option value="cable">Cable (approx.)</option>
+                        <option value="bodyweight">Bodyweight + Weight</option>
+                    </select>
+                </div>
+                <div id="balance-container"></div>
             </div></div>
 
             <!-- EXERCISES -->
@@ -558,7 +577,7 @@
             <button class="tab-btn active" onclick="showPage('log',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Log</button>
             <button class="tab-btn" onclick="showPage('history',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>History</button>
             <button class="tab-btn" onclick="showPage('progress',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-4 4"/></svg>Progress</button>
-            <button class="tab-btn" onclick="showPage('goals',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Goals</button>
+            <button class="tab-btn" onclick="showPage('balance',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v15M5 8l7-5 7 5M4 8v2a1 1 0 001 1h4a1 1 0 001-1V8M14 8v2a1 1 0 001 1h4a1 1 0 001-1V8"/></svg>Balance</button>
             <button class="tab-btn" onclick="showPage('exercises',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Exercises</button>
             <button class="tab-btn" onclick="showPage('data',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18m9-9H3"/><circle cx="12" cy="12" r="9"/></svg>Data</button>
         </div>
@@ -691,9 +710,49 @@
         {muscle: "NECK", name: "Neck Curls/Extensions", equipment: "Plate/Harness", primary: ["Neck"], secondary: []}
     ];
 
+    // ═══ Strength Ratios (relative to Barbell Bench Press = 1.0) ═══
+    // Sources: Symmetric Strength, ExRx strength standards
+    const strengthRatios = {
+        // Barbell compounds
+        "Bench Press|||Barbell":            { ratio: 1.00, category: "barbell", group: "Push" },
+        "Squat|||Barbell":                  { ratio: 1.25, category: "barbell", group: "Legs" },
+        "Squat (lighter)|||Barbell":        { ratio: 1.25, category: "barbell", group: "Legs" },
+        "Deadlift|||Barbell":               { ratio: 1.50, category: "barbell", group: "Pull" },
+        "Romanian Deadlift|||Barbell":      { ratio: 1.10, category: "barbell", group: "Pull" },
+        "Overhead Press|||Barbell":         { ratio: 0.65, category: "barbell", group: "Push" },
+        "Incline Bench Press|||Barbell":    { ratio: 0.80, category: "barbell", group: "Push" },
+        // Dumbbell (per-hand weight, ~40% of barbell equivalent)
+        "Incline Bench Press|||Dumbell":    { ratio: 0.35, category: "dumbbell", group: "Push" },
+        "Overhead Press|||Dumbbells":       { ratio: 0.28, category: "dumbbell", group: "Push" },
+        "Walking Lunge|||Dumbbells":        { ratio: 0.30, category: "dumbbell", group: "Legs" },
+        "One-armed Row|||Dumbell":          { ratio: 0.35, category: "dumbbell", group: "Pull" },
+        "Preacher Curl|||EZ Bar/Dumbbells": { ratio: 0.30, category: "dumbbell", group: "Pull" },
+        "Dumbbell Shrugs|||Dumbbells":      { ratio: 0.35, category: "dumbbell", group: "Pull" },
+        "Dumbbell Wrist Curls/Extensions|||Dumbbells": { ratio: 0.15, category: "dumbbell", group: "Pull" },
+        // Bodyweight + added weight
+        "Pull Up|||Bodyweight + Weight":    { ratio: 0.35, category: "bodyweight", group: "Pull" },
+        "Weighted Dips|||Bodyweight + Weight": { ratio: 0.40, category: "bodyweight", group: "Push" },
+        // Machine (approximate — weight stacks vary by manufacturer)
+        "Leg Press|||Machine":              { ratio: 2.00, category: "machine", group: "Legs" },
+        "Leg Extension|||Machine":          { ratio: 0.50, category: "machine", group: "Legs" },
+        "Seated Leg Curl|||Machine":        { ratio: 0.45, category: "machine", group: "Legs" },
+        "Nautilus Glute Drive|||Machine":   { ratio: 1.40, category: "machine", group: "Legs" },
+        "Machine Pec Deck|||Machine":       { ratio: 0.45, category: "machine", group: "Push" },
+        "Reverse Pec Deck|||Machine":       { ratio: 0.30, category: "machine", group: "Pull" },
+        "Standing Calf Raise|||Machine":    { ratio: 1.00, category: "machine", group: "Legs" },
+        "Chest Supp. T-Bar|||Machine":      { ratio: 0.65, category: "machine", group: "Pull" },
+        // Cable
+        "Bayesian Cable Curl|||Cable":      { ratio: 0.20, category: "cable", group: "Pull" },
+        "Ovrhd Cable Tri Ex.|||Cable":      { ratio: 0.25, category: "cable", group: "Push" },
+        "Cable Crunch|||Cable":             { ratio: 0.40, category: "cable", group: "Core" },
+        "Lateral Raise|||Cable":            { ratio: 0.12, category: "cable", group: "Push" },
+        "Reverse Pec Deck|||Cable":         { ratio: 0.15, category: "cable", group: "Pull" },
+        // Neck
+        "Neck Curls/Extensions|||Plate/Harness": { ratio: 0.15, category: "other", group: "Core" },
+    };
+
     let exercises = [...defaultExercises];
     let workoutData = [];
-    let goalsData = [];
 
     // ═══ Chart.js Light Theme ═══
     Chart.defaults.color = '#94a3b8';
@@ -706,23 +765,21 @@
     // ═══ Init ═══
     async function init() {
         populateExerciseDropdown();
-        populateGoalExerciseDropdown();
+        populateBaselineDropdown();
         populateMuscleFilter();
         setTodayDate();
         await loadCustomExercises();
         await loadData();
-        await loadGoals();
         renderProgress();
         renderTodaysWorkouts();
         renderExercisesList();
-        renderGoals();
         renderSummary();
         renderHistory();
         renderLogMuscleCoverage();
     }
 
     // ═══ Log Page Muscle Coverage ═══
-    var coverageDays = 7;
+    var coverageDays = parseInt(localStorage.getItem('coverageDays')) || 7;
     function renderLogMuscleCoverage() {
         const container = document.getElementById('log-muscle-coverage');
         
@@ -765,7 +822,7 @@
         
         const dayLabel = coverageDays === 1 ? 'Last 1 Day' : 'Last ' + coverageDays + ' Days';
         let html = '<div class="coverage-header-row"><div class="coverage-title">Muscle Coverage</div>';
-        html += '<select id="coverage-days-select" class="coverage-days-dropdown" onchange="coverageDays=parseInt(this.value);renderLogMuscleCoverage();">';
+        html += '<select id="coverage-days-select" class="coverage-days-dropdown" onchange="coverageDays=parseInt(this.value);localStorage.setItem(\'coverageDays\',coverageDays);renderLogMuscleCoverage();">';
         for (var i = 1; i <= 7; i++) {
             html += '<option value="' + i + '"' + (i === coverageDays ? ' selected' : '') + '>' + (i === 1 ? '1 Day' : i + ' Days') + '</option>';
         }
@@ -808,44 +865,6 @@
         `;
     }
 
-    // ═══ Goals CRUD ═══
-    async function loadGoals() {
-        if (!db) return;
-        try { const s = await db.collection('goals').get(); goalsData = []; s.forEach(doc => { goalsData.push({ id: doc.id, ...doc.data() }); }); } catch (e) { console.error('Error loading goals:', e); }
-    }
-    async function saveGoal(goal) { if (!db) { showToast('Database error.', 'error'); return false; } try { await db.collection('goals').add(goal); return true; } catch (e) { showToast('Error saving goal.', 'error'); return false; } }
-    async function deleteGoal(id) { if (!db) { showToast('Database error.', 'error'); return false; } try { await db.collection('goals').doc(id).delete(); return true; } catch (e) { return false; } }
-
-    function populateGoalExerciseDropdown() {
-        const select = document.getElementById('goal-exercise-select');
-        select.innerHTML = '<option value="">Select an exercise…</option>';
-        const sorted = exercises.map((ex, idx) => ({ ...ex, idx }))
-            .sort((a, b) => a.muscle.localeCompare(b.muscle) || a.name.localeCompare(b.name));
-        let currentMuscle = '', currentGroup = null;
-        sorted.forEach(ex => {
-            if (currentMuscle !== ex.muscle) {
-                currentMuscle = ex.muscle;
-                currentGroup = document.createElement('optgroup');
-                currentGroup.label = ex.muscle;
-                select.appendChild(currentGroup);
-            }
-            const o = document.createElement('option');
-            o.value = ex.idx;
-            o.textContent = `${ex.name} (${ex.equipment})`;
-            currentGroup.appendChild(o);
-        });
-    }
-
-    document.getElementById('goal-exercise-select').addEventListener('change', function() {
-        const infoDiv = document.getElementById('goal-current-info');
-        if (this.value !== '') {
-            const exercise = exercises[this.value];
-            const hist = workoutData.filter(d => d.exercise === exercise.name && d.equipment === exercise.equipment).sort((a, b) => new Date(b.date) - new Date(a.date));
-            if (hist.length > 0) { infoDiv.innerHTML = `Current: <strong>${hist[0].weight} lbs × ${hist[0].reps} reps</strong> (${formatDate(hist[0].date)})`; infoDiv.style.display = 'flex'; }
-            else { infoDiv.innerHTML = 'No workout history. Log a workout first.'; infoDiv.style.display = 'flex'; }
-        } else { infoDiv.style.display = 'none'; }
-    });
-
     // ═══ Custom Exercises ═══
     async function loadCustomExercises() {
         if (!db) return;
@@ -873,7 +892,7 @@
             
             exercises = [...mergedDefaults, ...markedCustoms]; 
             populateExerciseDropdown(); 
-            populateGoalExerciseDropdown(); 
+            populateBaselineDropdown(); 
         } catch (e) { console.error('Error loading custom exercises:', e); }
     }
     async function saveCustomExercise(exercise) { if (!db) { showToast('Database error.', 'error'); return false; } try { await db.collection('customExercises').add(exercise); return true; } catch (e) { showToast('Error saving exercise.', 'error'); return false; } }
@@ -1053,7 +1072,7 @@
                 await loadCustomExercises(); 
                 renderExercisesList(); 
                 populateExerciseDropdown();
-                populateGoalExerciseDropdown();
+                populateBaselineDropdown();
                 cancelExerciseEdit();
                 showToast('Exercise updated!'); 
             }
@@ -1076,7 +1095,7 @@
                     await loadCustomExercises(); 
                     renderExercisesList(); 
                     populateExerciseDropdown();
-                    populateGoalExerciseDropdown();
+                    populateBaselineDropdown();
                     cancelExerciseEdit();
                     showToast('Exercise updated!'); 
                 }
@@ -1091,7 +1110,7 @@
                     await loadCustomExercises(); 
                     renderExercisesList(); 
                     populateExerciseDropdown();
-                    populateGoalExerciseDropdown();
+                    populateBaselineDropdown();
                     cancelExerciseEdit();
                     showToast('Exercise updated!'); 
                 }
@@ -1103,7 +1122,7 @@
                 await loadCustomExercises(); 
                 renderExercisesList(); 
                 populateExerciseDropdown();
-                populateGoalExerciseDropdown();
+                populateBaselineDropdown();
                 this.reset(); 
                 showToast('Exercise added!'); 
             }
@@ -1319,7 +1338,7 @@
                 await loadCustomExercises();
                 renderExercisesList();
                 populateExerciseDropdown();
-                populateGoalExerciseDropdown();
+                populateBaselineDropdown();
                 
                 let msg = `Imported ${imported} exercises!`;
                 if (updated > 0) msg += ` Updated ${updated}.`;
@@ -1335,87 +1354,131 @@
         event.target.value = ''; // Reset file input
     }
 
-    // ═══ Goal Form ═══
-    document.getElementById('goal-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const exerciseIdx = document.getElementById('goal-exercise-select').value;
-        const targetWeight = parseFloat(document.getElementById('goal-target-weight').value);
-        if (!exerciseIdx) { showToast('Select an exercise.', 'error'); return; }
-        if (!targetWeight || isNaN(targetWeight)) { showToast('Enter a valid target weight.', 'error'); return; }
-        const exercise = exercises[exerciseIdx];
-        const hist = workoutData.filter(d => d.exercise === exercise.name && d.equipment === exercise.equipment).sort((a, b) => new Date(b.date) - new Date(a.date));
-        if (hist.length === 0) { showToast('Log a workout first.', 'error'); return; }
-        const lastWorkout = hist[0], startWeight = lastWorkout.weight, startReps = lastWorkout.reps;
-        if (targetWeight <= startWeight) { showToast(`Target must exceed current (${startWeight} lbs).`, 'error'); return; }
-        const weightIncrease = targetWeight - startWeight;
-        const isCompound = ['Squat', 'Deadlift', 'Bench Press', 'Overhead Press'].some(ex => exercise.name.includes(ex));
-        const weeklyIncrease = isCompound ? 5 : 2.5;
-        const weeks = Math.max(1, Math.ceil(weightIncrease / weeklyIncrease));
-        const progression = calculateSmartProgression(startWeight, targetWeight, startReps, weeks);
-        const goal = { muscle: exercise.muscle, exercise: exercise.name, equipment: exercise.equipment, startWeight: Number(startWeight), targetWeight: Number(targetWeight), startReps: Number(startReps), weeks: Number(weeks), progression, createdAt: firebase.firestore.Timestamp.now() };
-        const saved = await saveGoal(goal);
-        if (saved) { await loadGoals(); renderGoals(); this.reset(); document.getElementById('goal-current-info').style.display = 'none'; showToast(`${weeks}-week plan created!`); }
-    });
-
-    function calculateSmartProgression(startWeight, targetWeight, startReps, weeks) {
-        const progression = [];
-        const totalIncrease = targetWeight - startWeight;
-        const increments = Math.ceil(totalIncrease / 5);
-        const weeksPerIncrement = Math.max(2, Math.floor(weeks / increments));
-        let currentWeight = startWeight, weekCounter = 0;
-        for (let i = 0; i < increments && weekCounter < weeks; i++) {
-            for (let r = 0; r < weeksPerIncrement && weekCounter < weeks; r++) {
-                progression.push({ week: weekCounter + 1, weight: Math.round(currentWeight * 2) / 2, reps: Math.min(startReps + r, startReps + 4) });
-                weekCounter++;
+    // ═══ Balance Tab ═══
+    function populateBaselineDropdown() {
+        const select = document.getElementById('balance-baseline-select');
+        select.innerHTML = '';
+        exercises.forEach(ex => {
+            const key = ex.name + '|||' + ex.equipment;
+            const r = strengthRatios[key];
+            if (r && r.category === 'barbell') {
+                const o = document.createElement('option');
+                o.value = key;
+                o.textContent = ex.name + ' (' + ex.equipment + ')';
+                if (ex.name === 'Bench Press' && ex.equipment === 'Barbell') o.selected = true;
+                select.appendChild(o);
             }
-            currentWeight = Math.min(currentWeight + 5, targetWeight);
-        }
-        while (weekCounter < weeks) { progression.push({ week: weekCounter + 1, weight: targetWeight, reps: startReps }); weekCounter++; }
-        return progression;
+        });
     }
 
-    // ═══ Render Goals ═══
-    function renderGoals() {
-        const container = document.getElementById('goals-list-container');
-        if (goalsData.length === 0) { container.innerHTML = ''; return; }
+    function getExerciseBestRecent(name, equipment) {
+        const hist = workoutData
+            .filter(d => d.exercise === name && d.equipment === equipment)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+        if (hist.length === 0) return null;
+        const fourWeeksAgo = new Date();
+        fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+        const fourWeeksStr = localDateStr(fourWeeksAgo);
+        const recent = hist.filter(d => d.date >= fourWeeksStr);
+        const pool = recent.length > 0 ? recent : [hist[0]];
+        return { weight: Math.max(...pool.map(d => d.weight)), lastDate: hist[0].date, totalEntries: hist.length };
+    }
+
+    function computeBalanceData() {
+        const baselineKey = document.getElementById('balance-baseline-select').value;
+        if (!baselineKey) return null;
+        const [baseName, baseEquip] = baselineKey.split('|||');
+        const baselineData = getExerciseBestRecent(baseName, baseEquip);
+        if (!baselineData) return null;
+        const baselineWeight = baselineData.weight;
+        const categoryFilter = document.getElementById('balance-category-filter').value;
+        const results = [];
+        const seen = new Set();
+        exercises.forEach(ex => {
+            const key = ex.name + '|||' + ex.equipment;
+            if (seen.has(key)) return;
+            seen.add(key);
+            const ratioEntry = strengthRatios[key];
+            if (!ratioEntry) return;
+            if (key === baselineKey) return;
+            if (categoryFilter && ratioEntry.category !== categoryFilter) return;
+            const expectedWeight = Math.round(baselineWeight * ratioEntry.ratio * 2) / 2;
+            const actual = getExerciseBestRecent(ex.name, ex.equipment);
+            const percentage = actual ? Math.round((actual.weight / expectedWeight) * 100) : null;
+            let status;
+            if (!percentage) status = 'nodata';
+            else if (percentage >= 110) status = 'over';
+            else if (percentage >= 90) status = 'balanced';
+            else if (percentage >= 70) status = 'under';
+            else status = 'weak';
+            results.push({ name: ex.name, equipment: ex.equipment, muscle: ex.muscle, category: ratioEntry.category, group: ratioEntry.group, ratio: ratioEntry.ratio, expectedWeight, actualWeight: actual ? actual.weight : null, lastDate: actual ? actual.lastDate : null, totalEntries: actual ? actual.totalEntries : 0, percentage, status });
+        });
+        const statusOrder = { weak: 0, under: 1, balanced: 2, over: 3, nodata: 4 };
+        results.sort((a, b) => statusOrder[a.status] - statusOrder[b.status] || a.group.localeCompare(b.group));
+        return { baselineWeight, results };
+    }
+
+    function renderBalance() {
+        const container = document.getElementById('balance-container');
+        const scoreCard = document.getElementById('balance-score-card');
+        const filterBar = document.getElementById('balance-filter-bar');
+        const baselineInfo = document.getElementById('balance-baseline-info');
+        const data = computeBalanceData();
+        if (!data) {
+            container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">&#x2696;</div><div class="empty-state-text">No workout data for your baseline exercise yet.<br>Log some workouts to see your strength balance!</div></div>';
+            scoreCard.style.display = 'none';
+            filterBar.style.display = 'none';
+            baselineInfo.style.display = 'none';
+            return;
+        }
+        const baselineKey = document.getElementById('balance-baseline-select').value;
+        const baseName = baselineKey.split('|||')[0];
+        baselineInfo.innerHTML = 'Your ' + baseName + ': <strong>' + data.baselineWeight + ' lbs</strong>';
+        baselineInfo.style.display = 'flex';
+        filterBar.style.display = 'block';
+        // Overall score
+        const withData = data.results.filter(r => r.percentage !== null);
+        if (withData.length > 0) {
+            const cappedPcts = withData.map(r => Math.min(r.percentage, 110));
+            const avg = Math.round(cappedPcts.reduce((s, p) => s + p, 0) / cappedPcts.length);
+            scoreCard.style.display = 'block';
+            document.getElementById('balance-score-value').textContent = avg + '%';
+            const label = document.getElementById('balance-score-label');
+            if (avg >= 90) { label.textContent = 'Well Balanced'; label.style.background = 'var(--green-light)'; label.style.color = 'var(--green)'; }
+            else if (avg >= 75) { label.textContent = 'Mostly Balanced'; label.style.background = 'var(--accent-light)'; label.style.color = 'var(--accent)'; }
+            else if (avg >= 60) { label.textContent = 'Some Imbalances'; label.style.background = '#fef3c7'; label.style.color = '#ca8a04'; }
+            else { label.textContent = 'Needs Work'; label.style.background = 'var(--red-light)'; label.style.color = 'var(--red)'; }
+        } else { scoreCard.style.display = 'none'; }
+        // Render cards
         let html = '';
-        goalsData.forEach(goal => {
-            const totalIncrease = goal.targetWeight - goal.startWeight;
-            const weeklyAvg = (totalIncrease / goal.weeks).toFixed(1);
-            let currentWeek = 0;
-            const goalWorkouts = workoutData.filter(w => w.exercise === goal.exercise && w.equipment === goal.equipment);
-            if (goalWorkouts.length > 0 && goal.createdAt) {
-                const startDate = goal.createdAt.toDate();
-                const latestWorkout = new Date(goalWorkouts[goalWorkouts.length - 1].date);
-                currentWeek = Math.floor((latestWorkout - startDate) / (1000 * 60 * 60 * 24 * 7));
-            }
-            html += `
-                <div class="goal-card">
-                    <div class="goal-header">
-                        <div><div class="goal-title">${goal.exercise}</div><span class="tag tag-equipment" style="margin-top:4px;">${goal.equipment}</span></div>
-                        <button class="btn btn-danger btn-sm" onclick="removeGoal('${goal.id}')">Delete</button>
-                    </div>
-                    <div class="goal-stats">
-                        <div class="goal-stat"><div class="goal-stat-label">Current</div><div class="goal-stat-value">${goal.startWeight}<span style="font-size:11px;color:var(--text-muted);"> lbs</span></div></div>
-                        <div class="goal-stat"><div class="goal-stat-label">Target</div><div class="goal-stat-value">${goal.targetWeight}<span style="font-size:11px;color:var(--text-muted);"> lbs</span></div></div>
-                        <div class="goal-stat"><div class="goal-stat-label">Timeline</div><div class="goal-stat-value">${goal.weeks}<span style="font-size:11px;color:var(--text-muted);"> wks</span></div></div>
-                        <div class="goal-stat"><div class="goal-stat-label">Weekly +</div><div class="goal-stat-value">${weeklyAvg}<span style="font-size:11px;color:var(--text-muted);"> lbs</span></div></div>
-                    </div>
-                    <div class="goal-strategy">Double Progression — increase reps first, then add weight</div>
-                    <div class="table-wrap"><table><thead><tr><th>Week</th><th>Weight</th><th>Reps</th><th>Volume</th></tr></thead><tbody>
-                        ${goal.progression.map(p => {
-                            const vol = (p.weight * p.reps).toFixed(0);
-                            const done = p.week <= currentWeek;
-                            return `<tr class="${done ? 'week-complete' : ''}"><td>Wk ${p.week}</td><td>${p.weight} lbs</td><td>${p.reps}</td><td>${vol}</td></tr>`;
-                        }).join('')}
-                    </tbody></table></div>
-                </div>
-            `;
+        const categoryFilter = document.getElementById('balance-category-filter').value;
+        const hasMachineOrCable = data.results.some(r => r.category === 'machine' || r.category === 'cable');
+        if (hasMachineOrCable && (!categoryFilter || categoryFilter === 'machine' || categoryFilter === 'cable')) {
+            html += '<div class="balance-category-disclaimer">Machine &amp; cable ratios are approximate. Weight stacks vary by manufacturer.</div>';
+        }
+        let currentGroup = '';
+        const barColor = { over: 'var(--green)', balanced: 'var(--accent)', under: '#ca8a04', weak: 'var(--red)', nodata: 'var(--border)' };
+        data.results.forEach(r => {
+            if (currentGroup !== r.group) { currentGroup = r.group; html += '<div class="balance-group-header">' + r.group + '</div>'; }
+            const barWidth = r.percentage ? Math.min(r.percentage, 150) : 0;
+            const targetPos = (100 / 1.5);
+            html += '<div class="balance-card">';
+            html += '<div class="balance-card-header"><div><div class="balance-card-name">' + r.name + '</div><span class="tag tag-equipment" style="font-size:10px;padding:2px 6px;">' + r.equipment + '</span></div>';
+            if (r.percentage !== null) { html += '<div class="balance-pct ' + r.status + '">' + r.percentage + '%</div>'; }
+            else { html += '<span class="balance-nodata">No data</span>'; }
+            html += '</div>';
+            html += '<div class="balance-bar-track"><div class="balance-bar-fill" style="width:' + (barWidth / 1.5) + '%;background:' + barColor[r.status] + ';"></div><div class="balance-bar-target" style="left:' + targetPos + '%;"></div></div>';
+            html += '<div class="balance-stats-row"><span>Expected: <strong>' + r.expectedWeight + ' lbs</strong></span>';
+            if (r.actualWeight !== null) { html += '<span>Actual: <strong>' + r.actualWeight + ' lbs</strong></span>'; }
+            html += '</div>';
+            if (r.lastDate) { html += '<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Last: ' + formatDate(r.lastDate) + ' &middot; ' + r.totalEntries + ' entries</div>'; }
+            html += '</div>';
         });
         container.innerHTML = html;
     }
 
-    async function removeGoal(id) { const c = await showConfirm('Delete this goal?'); if (!c) return; const d = await deleteGoal(id); if (d) { await loadGoals(); renderGoals(); showToast('Goal deleted.'); } }
+    document.getElementById('balance-baseline-select').addEventListener('change', renderBalance);
+    document.getElementById('balance-category-filter').addEventListener('change', renderBalance);
 
     // ═══ Muscle Filter ═══
     function populateMuscleFilter() {
@@ -1459,6 +1522,7 @@
         if (btn) btn.classList.add('active');
         if (page === 'progress') renderProgress();
         if (page === 'history') renderHistory();
+        if (page === 'balance') renderBalance();
     }
 
     // ═══ Render Progress — with teal charts ═══
@@ -1636,7 +1700,7 @@
             // Build muscle coverage summary HTML
             var html = '<div class="muscle-coverage-summary">';
             html += '<div class="coverage-header-row"><div class="coverage-title">Muscle Coverage</div>';
-            html += '<select class="coverage-days-dropdown" onchange="coverageDays=parseInt(this.value);renderLogMuscleCoverage();renderHistory();">';
+            html += '<select class="coverage-days-dropdown" onchange="coverageDays=parseInt(this.value);localStorage.setItem(\'coverageDays\',coverageDays);renderLogMuscleCoverage();renderHistory();">';
             for (var di = 1; di <= 7; di++) {
                 html += '<option value="' + di + '"' + (di === coverageDays ? ' selected' : '') + '>' + (di === 1 ? '1 Day' : di + ' Days') + '</option>';
             }

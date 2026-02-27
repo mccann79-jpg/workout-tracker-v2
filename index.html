@@ -700,6 +700,9 @@
     Chart.defaults.borderColor = '#e2e8f0';
     Chart.defaults.font.family = "'DM Sans', sans-serif";
 
+    // ═══ Helpers ═══
+    function localDateStr(d) { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+
     // ═══ Init ═══
     async function init() {
         populateExerciseDropdown();
@@ -732,8 +735,8 @@
         const today = new Date();
         const cutoff = new Date(today);
         cutoff.setDate(today.getDate() - coverageDays);
-        const cutoffStr = cutoff.toISOString().split('T')[0];
-        
+        const cutoffStr = localDateStr(cutoff);
+
         // Dynamically build muscle groups from all exercises
         const allMuscleGroupsSet = new Set();
         exercises.forEach(ex => {
@@ -791,7 +794,7 @@
     // ═══ Summary Stats ═══
     function renderSummary() {
         const bar = document.getElementById('summary-bar');
-        const today = new Date().toISOString().split('T')[0];
+        const today = localDateStr();
         const todayEntries = workoutData.filter(d => d.date === today);
         if (todayEntries.length === 0) { bar.style.display = 'none'; return; }
         const totalSets = todayEntries.length;
@@ -879,7 +882,7 @@
     // ═══ Today's Workouts ═══
     function renderTodaysWorkouts() {
         const container = document.getElementById('todays-workouts-container');
-        const today = new Date().toISOString().split('T')[0];
+        const today = localDateStr();
         const todaysWorkouts = workoutData.filter(d => d.date === today);
         if (todaysWorkouts.length === 0) { container.innerHTML = ''; return; }
 
@@ -1224,7 +1227,7 @@
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `exercises-${new Date().toISOString().split('T')[0]}.csv`;
+        link.download = `exercises-${localDateStr()}.csv`;
         link.click();
         
         showToast(`Exported ${exportableExercises.length} exercises!`);
@@ -1421,7 +1424,7 @@
         muscles.forEach(muscle => { const o = document.createElement('option'); o.value = muscle; o.textContent = muscle; select.appendChild(o); });
     }
 
-    function setTodayDate() { document.getElementById('date-input').value = new Date().toISOString().split('T')[0]; }
+    function setTodayDate() { document.getElementById('date-input').value = localDateStr(); }
 
     // ═══ Log Workout ═══
     document.getElementById('workout-form').addEventListener('submit', async function(e) {
@@ -1590,7 +1593,7 @@
             const today = new Date();
             const cutoff = new Date(today);
             cutoff.setDate(today.getDate() - coverageDays);
-            const cutoffStr = cutoff.toISOString().split('T')[0];
+            const cutoffStr = localDateStr(cutoff);
             
             // Dynamically build muscle groups from all exercises
             const allMuscleGroupsSet = new Set();
@@ -1620,10 +1623,10 @@
                 try {
                     const dt = new Date(dateStr + 'T12:00:00');
                     const today = new Date();
-                    const todayStr = today.toISOString().split('T')[0];
+                    const todayStr = localDateStr(today);
                     const yesterday = new Date(today);
                     yesterday.setDate(today.getDate() - 1);
-                    const yesterdayStr = yesterday.toISOString().split('T')[0];
+                    const yesterdayStr = localDateStr(yesterday);
                     if (dateStr === todayStr) return 'Today';
                     if (dateStr === yesterdayStr) return 'Yesterday';
                     return dt.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
@@ -1775,7 +1778,7 @@
         const blob = new Blob([csv], { type: 'text/csv' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `lift-data-${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `lift-data-${localDateStr()}.csv`;
         a.click();
         showToast('CSV exported!');
     }

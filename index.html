@@ -200,21 +200,6 @@
         .today-card-stats { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--accent); text-align: right; }
         .today-card-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-        /* ─── Goals ─── */
-        .goal-card { background: var(--bg-card); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-        .goal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .goal-title { font-size: 16px; font-weight: 700; }
-        .goal-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-        .goal-stat { background: var(--bg-elevated); border-radius: var(--radius-sm); padding: 10px 12px; }
-        .goal-stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
-        .goal-stat-value { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--accent); margin-top: 2px; }
-        .goal-strategy { font-size: 12px; color: var(--accent-text); font-style: italic; margin-bottom: 12px; padding: 8px 12px; background: var(--accent-light); border-radius: var(--radius-sm); border-left: 3px solid var(--accent); }
-        .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: var(--bg-elevated); color: var(--text-secondary); padding: 9px 10px; text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
-        td { padding: 9px 10px; border-top: 1px solid var(--border); }
-        tr.week-complete td { background: var(--green-light); color: var(--green); }
-
         /* ─── Exercise List ─── */
         .exercise-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: var(--bg-elevated); margin-bottom: 5px; border-radius: var(--radius-sm); }
         .exercise-list-name { font-weight: 600; font-size: 14px; }
@@ -398,7 +383,6 @@
             #progress-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
             #progress-container .muscle-header { grid-column: 1 / -1; }
             .chart-container { height: 200px; }
-            #goals-list-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
             .exercises-grid { display: grid; grid-template-columns: 360px 1fr; gap: 16px; align-items: start; }
             .data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
             .today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -417,11 +401,9 @@
             .header { padding: 12px 40px 14px; }
             #progress-container { grid-template-columns: 1fr 1fr 1fr; }
             .chart-container { height: 220px; }
-            #goals-list-container { grid-template-columns: 1fr 1fr 1fr; }
             .exercises-grid { grid-template-columns: 400px 1fr; }
             .log-grid { grid-template-columns: minmax(360px, 460px) 1fr; }
             .today-grid { grid-template-columns: 1fr 1fr 1fr; }
-            .goal-stats { grid-template-columns: 1fr 1fr 1fr 1fr; }
         }
 
         /* ═══ Wide 1400px+ ═══ */
@@ -488,20 +470,6 @@
                 <div id="progress-container"></div>
             </div></div>
 
-            <!-- GOALS -->
-            <div id="goals-page" class="page"><div class="page-inner">
-                <div class="card">
-                    <div class="card-title"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Set Goal</div>
-                    <form id="goal-form">
-                        <div class="form-group"><label class="form-label">Exercise</label><select id="goal-exercise-select" required><option value="">Select an exercise…</option></select></div>
-                        <div id="goal-current-info" style="display:none;" class="last-entry-bar"></div>
-                        <div class="form-group"><label class="form-label">Target Weight (lbs)</label><input type="number" id="goal-target-weight" step="0.5" placeholder="0" required inputmode="decimal"></div>
-                        <button type="submit" class="btn btn-primary"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Generate Plan</button>
-                    </form>
-                </div>
-                <div id="goals-list-container"></div>
-            </div></div>
-
             <!-- EXERCISES -->
             <div id="exercises-page" class="page"><div class="page-inner exercises-grid">
                 <div class="card">
@@ -558,8 +526,7 @@
             <button class="tab-btn active" onclick="showPage('log',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Log</button>
             <button class="tab-btn" onclick="showPage('history',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>History</button>
             <button class="tab-btn" onclick="showPage('progress',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-4 4"/></svg>Progress</button>
-            <button class="tab-btn" onclick="showPage('goals',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Goals</button>
-            <button class="tab-btn" onclick="showPage('exercises',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Exercises</button>
+<button class="tab-btn" onclick="showPage('exercises',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Exercises</button>
             <button class="tab-btn" onclick="showPage('data',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18m9-9H3"/><circle cx="12" cy="12" r="9"/></svg>Data</button>
         </div>
     </div>
@@ -693,8 +660,6 @@
 
     let exercises = [...defaultExercises];
     let workoutData = [];
-    let goalsData = [];
-
     // ═══ Chart.js Light Theme ═══
     Chart.defaults.color = '#94a3b8';
     Chart.defaults.borderColor = '#e2e8f0';
@@ -706,16 +671,13 @@
     // ═══ Init ═══
     async function init() {
         populateExerciseDropdown();
-        populateGoalExerciseDropdown();
         populateMuscleFilter();
         setTodayDate();
         await loadCustomExercises();
         await loadData();
-        await loadGoals();
         renderProgress();
         renderTodaysWorkouts();
         renderExercisesList();
-        renderGoals();
         renderSummary();
         renderHistory();
         renderLogMuscleCoverage();
@@ -808,44 +770,6 @@
         `;
     }
 
-    // ═══ Goals CRUD ═══
-    async function loadGoals() {
-        if (!db) return;
-        try { const s = await db.collection('goals').get(); goalsData = []; s.forEach(doc => { goalsData.push({ id: doc.id, ...doc.data() }); }); } catch (e) { console.error('Error loading goals:', e); }
-    }
-    async function saveGoal(goal) { if (!db) { showToast('Database error.', 'error'); return false; } try { await db.collection('goals').add(goal); return true; } catch (e) { showToast('Error saving goal.', 'error'); return false; } }
-    async function deleteGoal(id) { if (!db) { showToast('Database error.', 'error'); return false; } try { await db.collection('goals').doc(id).delete(); return true; } catch (e) { return false; } }
-
-    function populateGoalExerciseDropdown() {
-        const select = document.getElementById('goal-exercise-select');
-        select.innerHTML = '<option value="">Select an exercise…</option>';
-        const sorted = exercises.map((ex, idx) => ({ ...ex, idx }))
-            .sort((a, b) => a.muscle.localeCompare(b.muscle) || a.name.localeCompare(b.name));
-        let currentMuscle = '', currentGroup = null;
-        sorted.forEach(ex => {
-            if (currentMuscle !== ex.muscle) {
-                currentMuscle = ex.muscle;
-                currentGroup = document.createElement('optgroup');
-                currentGroup.label = ex.muscle;
-                select.appendChild(currentGroup);
-            }
-            const o = document.createElement('option');
-            o.value = ex.idx;
-            o.textContent = `${ex.name} (${ex.equipment})`;
-            currentGroup.appendChild(o);
-        });
-    }
-
-    document.getElementById('goal-exercise-select').addEventListener('change', function() {
-        const infoDiv = document.getElementById('goal-current-info');
-        if (this.value !== '') {
-            const exercise = exercises[this.value];
-            const hist = workoutData.filter(d => d.exercise === exercise.name && d.equipment === exercise.equipment).sort((a, b) => new Date(b.date) - new Date(a.date));
-            if (hist.length > 0) { infoDiv.innerHTML = `Current: <strong>${hist[0].weight} lbs × ${hist[0].reps} reps</strong> (${formatDate(hist[0].date)})`; infoDiv.style.display = 'flex'; }
-            else { infoDiv.innerHTML = 'No workout history. Log a workout first.'; infoDiv.style.display = 'flex'; }
-        } else { infoDiv.style.display = 'none'; }
-    });
-
     // ═══ Custom Exercises ═══
     async function loadCustomExercises() {
         if (!db) return;
@@ -873,7 +797,7 @@
             
             exercises = [...mergedDefaults, ...markedCustoms]; 
             populateExerciseDropdown(); 
-            populateGoalExerciseDropdown(); 
+
         } catch (e) { console.error('Error loading custom exercises:', e); }
     }
     async function saveCustomExercise(exercise) { if (!db) { showToast('Database error.', 'error'); return false; } try { await db.collection('customExercises').add(exercise); return true; } catch (e) { showToast('Error saving exercise.', 'error'); return false; } }
@@ -1053,7 +977,6 @@
                 await loadCustomExercises(); 
                 renderExercisesList(); 
                 populateExerciseDropdown();
-                populateGoalExerciseDropdown();
                 cancelExerciseEdit();
                 showToast('Exercise updated!'); 
             }
@@ -1076,8 +999,7 @@
                     await loadCustomExercises(); 
                     renderExercisesList(); 
                     populateExerciseDropdown();
-                    populateGoalExerciseDropdown();
-                    cancelExerciseEdit();
+                        cancelExerciseEdit();
                     showToast('Exercise updated!'); 
                 }
             } else {
@@ -1091,8 +1013,7 @@
                     await loadCustomExercises(); 
                     renderExercisesList(); 
                     populateExerciseDropdown();
-                    populateGoalExerciseDropdown();
-                    cancelExerciseEdit();
+                        cancelExerciseEdit();
                     showToast('Exercise updated!'); 
                 }
             }
@@ -1103,7 +1024,6 @@
                 await loadCustomExercises(); 
                 renderExercisesList(); 
                 populateExerciseDropdown();
-                populateGoalExerciseDropdown();
                 this.reset(); 
                 showToast('Exercise added!'); 
             }
@@ -1319,7 +1239,6 @@
                 await loadCustomExercises();
                 renderExercisesList();
                 populateExerciseDropdown();
-                populateGoalExerciseDropdown();
                 
                 let msg = `Imported ${imported} exercises!`;
                 if (updated > 0) msg += ` Updated ${updated}.`;
@@ -1334,88 +1253,6 @@
         reader.readAsText(file);
         event.target.value = ''; // Reset file input
     }
-
-    // ═══ Goal Form ═══
-    document.getElementById('goal-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const exerciseIdx = document.getElementById('goal-exercise-select').value;
-        const targetWeight = parseFloat(document.getElementById('goal-target-weight').value);
-        if (!exerciseIdx) { showToast('Select an exercise.', 'error'); return; }
-        if (!targetWeight || isNaN(targetWeight)) { showToast('Enter a valid target weight.', 'error'); return; }
-        const exercise = exercises[exerciseIdx];
-        const hist = workoutData.filter(d => d.exercise === exercise.name && d.equipment === exercise.equipment).sort((a, b) => new Date(b.date) - new Date(a.date));
-        if (hist.length === 0) { showToast('Log a workout first.', 'error'); return; }
-        const lastWorkout = hist[0], startWeight = lastWorkout.weight, startReps = lastWorkout.reps;
-        if (targetWeight <= startWeight) { showToast(`Target must exceed current (${startWeight} lbs).`, 'error'); return; }
-        const weightIncrease = targetWeight - startWeight;
-        const isCompound = ['Squat', 'Deadlift', 'Bench Press', 'Overhead Press'].some(ex => exercise.name.includes(ex));
-        const weeklyIncrease = isCompound ? 5 : 2.5;
-        const weeks = Math.max(1, Math.ceil(weightIncrease / weeklyIncrease));
-        const progression = calculateSmartProgression(startWeight, targetWeight, startReps, weeks);
-        const goal = { muscle: exercise.muscle, exercise: exercise.name, equipment: exercise.equipment, startWeight: Number(startWeight), targetWeight: Number(targetWeight), startReps: Number(startReps), weeks: Number(weeks), progression, createdAt: firebase.firestore.Timestamp.now() };
-        const saved = await saveGoal(goal);
-        if (saved) { await loadGoals(); renderGoals(); this.reset(); document.getElementById('goal-current-info').style.display = 'none'; showToast(`${weeks}-week plan created!`); }
-    });
-
-    function calculateSmartProgression(startWeight, targetWeight, startReps, weeks) {
-        const progression = [];
-        const totalIncrease = targetWeight - startWeight;
-        const increments = Math.ceil(totalIncrease / 5);
-        const weeksPerIncrement = Math.max(2, Math.floor(weeks / increments));
-        let currentWeight = startWeight, weekCounter = 0;
-        for (let i = 0; i < increments && weekCounter < weeks; i++) {
-            for (let r = 0; r < weeksPerIncrement && weekCounter < weeks; r++) {
-                progression.push({ week: weekCounter + 1, weight: Math.round(currentWeight * 2) / 2, reps: Math.min(startReps + r, startReps + 4) });
-                weekCounter++;
-            }
-            currentWeight = Math.min(currentWeight + 5, targetWeight);
-        }
-        while (weekCounter < weeks) { progression.push({ week: weekCounter + 1, weight: targetWeight, reps: startReps }); weekCounter++; }
-        return progression;
-    }
-
-    // ═══ Render Goals ═══
-    function renderGoals() {
-        const container = document.getElementById('goals-list-container');
-        if (goalsData.length === 0) { container.innerHTML = ''; return; }
-        let html = '';
-        goalsData.forEach(goal => {
-            const totalIncrease = goal.targetWeight - goal.startWeight;
-            const weeklyAvg = (totalIncrease / goal.weeks).toFixed(1);
-            let currentWeek = 0;
-            const goalWorkouts = workoutData.filter(w => w.exercise === goal.exercise && w.equipment === goal.equipment);
-            if (goalWorkouts.length > 0 && goal.createdAt) {
-                const startDate = goal.createdAt.toDate();
-                const latestWorkout = new Date(goalWorkouts[goalWorkouts.length - 1].date);
-                currentWeek = Math.floor((latestWorkout - startDate) / (1000 * 60 * 60 * 24 * 7));
-            }
-            html += `
-                <div class="goal-card">
-                    <div class="goal-header">
-                        <div><div class="goal-title">${goal.exercise}</div><span class="tag tag-equipment" style="margin-top:4px;">${goal.equipment}</span></div>
-                        <button class="btn btn-danger btn-sm" onclick="removeGoal('${goal.id}')">Delete</button>
-                    </div>
-                    <div class="goal-stats">
-                        <div class="goal-stat"><div class="goal-stat-label">Current</div><div class="goal-stat-value">${goal.startWeight}<span style="font-size:11px;color:var(--text-muted);"> lbs</span></div></div>
-                        <div class="goal-stat"><div class="goal-stat-label">Target</div><div class="goal-stat-value">${goal.targetWeight}<span style="font-size:11px;color:var(--text-muted);"> lbs</span></div></div>
-                        <div class="goal-stat"><div class="goal-stat-label">Timeline</div><div class="goal-stat-value">${goal.weeks}<span style="font-size:11px;color:var(--text-muted);"> wks</span></div></div>
-                        <div class="goal-stat"><div class="goal-stat-label">Weekly +</div><div class="goal-stat-value">${weeklyAvg}<span style="font-size:11px;color:var(--text-muted);"> lbs</span></div></div>
-                    </div>
-                    <div class="goal-strategy">Double Progression — increase reps first, then add weight</div>
-                    <div class="table-wrap"><table><thead><tr><th>Week</th><th>Weight</th><th>Reps</th><th>Volume</th></tr></thead><tbody>
-                        ${goal.progression.map(p => {
-                            const vol = (p.weight * p.reps).toFixed(0);
-                            const done = p.week <= currentWeek;
-                            return `<tr class="${done ? 'week-complete' : ''}"><td>Wk ${p.week}</td><td>${p.weight} lbs</td><td>${p.reps}</td><td>${vol}</td></tr>`;
-                        }).join('')}
-                    </tbody></table></div>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-    }
-
-    async function removeGoal(id) { const c = await showConfirm('Delete this goal?'); if (!c) return; const d = await deleteGoal(id); if (d) { await loadGoals(); renderGoals(); showToast('Goal deleted.'); } }
 
     // ═══ Muscle Filter ═══
     function populateMuscleFilter() {

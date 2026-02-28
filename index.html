@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="LIFT">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#0d9488">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,49 +26,61 @@
 
     <style>
         :root {
-            --bg: #ffffff;
-            --bg-page: #f5f6f8;
-            --bg-card: #ffffff;
-            --bg-elevated: #f0f1f4;
-            --bg-input: #f7f8fa;
+            --bg: rgba(255,255,255,0.65);
+            --bg-page: transparent;
+            --bg-card: rgba(255,255,255,0.55);
+            --bg-elevated: rgba(255,255,255,0.35);
+            --bg-input: rgba(255,255,255,0.50);
             --accent: #0d9488;
-            --accent-light: #ccfbf1;
-            --accent-glow: rgba(13,148,136,0.18);
+            --accent-light: rgba(13,148,136,0.12);
+            --accent-glow: rgba(13,148,136,0.22);
             --accent-text: #0f766e;
             --green: #16a34a;
-            --green-light: #dcfce7;
+            --green-light: rgba(22,163,74,0.10);
             --yellow: #d97706;
-            --yellow-light: #fef3c7;
+            --yellow-light: rgba(217,119,6,0.12);
             --red: #dc2626;
-            --red-light: #fee2e2;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
+            --red-light: rgba(254,226,226,0.65);
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a5568;
             --text-muted: #94a3b8;
-            --border: #e2e8f0;
-            --border-strong: #cbd5e1;
-            --radius: 12px;
-            --radius-sm: 8px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-            --shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --border: rgba(255,255,255,0.25);
+            --border-strong: rgba(255,255,255,0.40);
+            --radius: 16px;
+            --radius-sm: 12px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04), inset 0 0 1px rgba(255,255,255,0.2);
+            --shadow: 0 4px 16px rgba(0,0,0,0.06), inset 0 0 1px rgba(255,255,255,0.25);
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
-            --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'DM Sans', system-ui, sans-serif;
             --font-mono: 'Space Mono', monospace;
+            --glass-blur: 24px;
+            --glass-saturate: 1.8;
+            --glass-border: 1px solid rgba(255,255,255,0.22);
+            --glass-shadow: 0 8px 32px rgba(0,0,0,0.06);
+            --glass-inner-glow: inset 0 1px 1px rgba(255,255,255,0.4);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { height: 100%; }
         body {
-            font-family: var(--font); background: var(--bg-page); color: var(--text-primary);
+            font-family: var(--font); color: var(--text-primary);
             -webkit-font-smoothing: antialiased; height: 100%; overflow: hidden;
             position: fixed; width: 100%;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(13,148,136,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 10%, rgba(99,102,241,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 80%, rgba(236,72,153,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 10% 70%, rgba(59,130,246,0.10) 0%, transparent 50%),
+                linear-gradient(135deg, #eef2ff 0%, #f0fdf4 30%, #ecfeff 60%, #fdf2f8 100%);
+            background-attachment: fixed;
         }
 
         .app { display: flex; flex-direction: column; height: 100%; height: 100dvh; height: -webkit-fill-available; }
-        .status-bar-spacer { min-height: var(--safe-top); background: var(--bg); }
+        .status-bar-spacer { min-height: var(--safe-top); background: rgba(13,148,136,0.75); backdrop-filter: blur(30px) saturate(1.8); -webkit-backdrop-filter: blur(30px) saturate(1.8); }
 
         /* ─── Header ─── */
-        .header { background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%); padding: 20px 20px 18px; border-bottom: none; box-shadow: 0 2px 12px rgba(13, 148, 136, 0.25); flex-shrink: 0; }
+        .header { background: rgba(13,148,136,0.75); backdrop-filter: blur(30px) saturate(1.8); -webkit-backdrop-filter: blur(30px) saturate(1.8); padding: 20px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.18); box-shadow: 0 4px 20px rgba(13,148,136,0.15), inset 0 -1px 0 rgba(255,255,255,0.1); flex-shrink: 0; }
         .header-row { display: flex; align-items: center; justify-content: space-between; }
         .logo { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: 4px; }
         .header-subtitle { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 1px; }
@@ -83,28 +95,28 @@
         .page-inner { max-width: 1400px; margin: 0 auto; }
 
         /* ─── Bottom Nav ─── */
-        .bottom-nav { display: flex; background: var(--bg); border-top: 1px solid var(--border); padding: 4px 0 calc(4px + var(--safe-bottom)); flex-shrink: 0; }
+        .bottom-nav { display: flex; background: rgba(255,255,255,0.70); backdrop-filter: blur(30px) saturate(1.8); -webkit-backdrop-filter: blur(30px) saturate(1.8); border-top: 1px solid rgba(255,255,255,0.30); padding: 6px 0 calc(6px + var(--safe-bottom)); flex-shrink: 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.04); }
         .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 0; background: none; border: none; color: var(--text-muted); font-family: var(--font); font-size: 9px; font-weight: 500; cursor: pointer; transition: color .2s; position: relative; }
         .tab-btn svg { width: 20px; height: 20px; }
         .tab-btn.active { color: var(--accent); }
-        .tab-btn.active::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:20px; height:2px; background:var(--accent); border-radius:1px; }
+        .tab-btn.active::before { content:''; position:absolute; top:0; left:50%; transform:translateX(-50%); width:24px; height:3px; background:var(--accent); border-radius:2px; box-shadow: 0 0 8px rgba(13,148,136,0.4); }
 
         /* ─── Cards ─── */
-        .card { background: var(--bg-card); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+        .card { background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border-radius: var(--radius); padding: 20px; margin-bottom: 14px; border: var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-inner-glow); }
         .card-title { font-size: 16px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 
         /* ─── Forms ─── */
         .form-group { margin-bottom: 12px; }
         .form-label { display: block; font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
         select, input[type="text"], input[type="number"], input[type="date"] {
-            width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--font); font-size: 15px;
-            transition: border-color .2s, box-shadow .2s; appearance: none; -webkit-appearance: none;
+            width: 100%; padding: 11px 14px; background: rgba(255,255,255,0.50); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255,255,255,0.30); border-radius: var(--radius-sm); color: var(--text-primary); font-family: var(--font); font-size: 15px;
+            transition: border-color .2s, box-shadow .2s, background .2s; appearance: none; -webkit-appearance: none;
         }
         select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='%2394a3b8'%3E%3Cpath d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 34px; }
         select[size] { background-image: none; padding-right: 12px; }
-        select:focus, input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-        select option { background: var(--bg-card); color: var(--text-primary); }
+        select:focus, input:focus { outline: none; border-color: rgba(13,148,136,0.5); box-shadow: 0 0 0 3px var(--accent-glow), inset 0 0 0 1px rgba(13,148,136,0.15); background: rgba(255,255,255,0.65); }
+        select option { background: #f8f9fa; color: var(--text-primary); }
         select optgroup { font-weight: 700; font-size: 12px; color: var(--accent); padding: 6px 0 2px; font-style: normal; }
         select optgroup option { font-weight: 400; font-size: 15px; color: var(--text-primary); padding-left: 8px; }
 
@@ -113,9 +125,11 @@
             margin-top: 6px;
             max-height: 320px;
             overflow-y: auto;
-            border: 1.5px solid var(--border);
+            border: 1.5px solid rgba(255,255,255,0.25);
             border-radius: var(--radius-sm);
-            background: var(--bg-input);
+            background: rgba(255,255,255,0.45);
+            backdrop-filter: blur(16px) saturate(1.5);
+            -webkit-backdrop-filter: blur(16px) saturate(1.5);
         }
         .exercise-picker:empty { display: none; }
         .picker-group-label {
@@ -127,23 +141,25 @@
             letter-spacing: 1px;
             position: sticky;
             top: 0;
-            background: var(--bg-elevated);
-            border-bottom: 1px solid var(--border);
+            background: rgba(240,241,244,0.80);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.20);
             z-index: 1;
         }
         .picker-item {
-            padding: 9px 12px;
+            padding: 10px 14px;
             font-size: 14px;
             cursor: pointer;
-            border-bottom: 1px solid var(--border);
-            transition: background .1s;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            transition: background .15s;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         .picker-item:last-child { border-bottom: none; }
-        .picker-item:hover, .picker-item:active { background: var(--accent-light); }
-        .picker-item.selected { background: var(--accent-light); font-weight: 600; }
+        .picker-item:hover, .picker-item:active { background: rgba(13,148,136,0.08); }
+        .picker-item.selected { background: rgba(13,148,136,0.12); font-weight: 600; }
         .picker-item .picker-equip { font-size: 11px; color: var(--text-muted); }
         .picker-empty { padding: 16px; text-align: center; color: var(--text-muted); font-size: 13px; }
 
@@ -153,35 +169,35 @@
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         /* ─── Buttons ─── */
-        .btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 12px; border: none; border-radius: var(--radius-sm); font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; transition: transform .1s, opacity .2s; }
+        .btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 12px; border: none; border-radius: var(--radius-sm); font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; transition: transform .1s, opacity .2s, background .2s; }
         .btn:active { transform: scale(.97); }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { opacity: .9; }
-        .btn-secondary { background: var(--bg-elevated); color: var(--text-primary); border: 1px solid var(--border); }
-        .btn-danger { background: var(--red-light); color: var(--red); border: 1px solid #fca5a5; }
-        .btn-sm { padding: 5px 10px; font-size: 12px; width: auto; border-radius: 6px; }
-        .btn-icon { width: 30px; height: 30px; padding: 0; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-primary { background: linear-gradient(135deg, rgba(13,148,136,0.90), rgba(15,118,110,0.95)); color: white; box-shadow: 0 4px 12px rgba(13,148,136,0.25), inset 0 1px 1px rgba(255,255,255,0.20); border: 1px solid rgba(255,255,255,0.15); }
+        .btn-primary:hover { opacity: .92; }
+        .btn-secondary { background: rgba(255,255,255,0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: var(--text-primary); border: 1px solid rgba(255,255,255,0.30); box-shadow: var(--glass-inner-glow); }
+        .btn-danger { background: rgba(254,226,226,0.65); color: var(--red); border: 1px solid rgba(252,165,165,0.40); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .btn-sm { padding: 5px 10px; font-size: 12px; width: auto; border-radius: 8px; }
+        .btn-icon { width: 32px; height: 32px; padding: 0; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; }
 
         /* ─── Tags ─── */
-        .tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .2px; }
-        .tag-equipment { background: var(--bg-elevated); color: var(--text-secondary); border: 1px solid var(--border); }
-        .tag-muscle { background: var(--accent-light); color: var(--accent-text); }
-        .tag-custom { background: var(--green-light); color: var(--green); }
-        .tag-pr { background: var(--yellow-light); color: var(--yellow); }
+        .tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: .2px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+        .tag-equipment { background: rgba(255,255,255,0.45); color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.25); }
+        .tag-muscle { background: rgba(13,148,136,0.12); color: var(--accent-text); border: 1px solid rgba(13,148,136,0.15); }
+        .tag-custom { background: rgba(22,163,74,0.10); color: var(--green); border: 1px solid rgba(22,163,74,0.15); }
+        .tag-pr { background: rgba(217,119,6,0.12); color: var(--yellow); border: 1px solid rgba(217,119,6,0.15); }
 
         /* ─── Last Entry ─── */
-        .last-entry-bar { display: flex; align-items: center; gap: 8px; background: var(--accent-light); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 12px; font-size: 13px; color: var(--accent-text); border-left: 3px solid var(--accent); }
+        .last-entry-bar { display: flex; align-items: center; gap: 8px; background: rgba(13,148,136,0.08); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 12px; font-size: 13px; color: var(--accent-text); border: 1px solid rgba(13,148,136,0.12); border-left: 3px solid var(--accent); }
         .last-entry-bar strong { color: var(--text-primary); }
 
         /* ─── Progress Cards ─── */
-        .exercise-card { background: var(--bg-card); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+        .exercise-card { background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border-radius: var(--radius); padding: 18px; border: var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-inner-glow); }
         .exercise-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .exercise-card-name { font-weight: 700; font-size: 15px; }
         .exercise-card-latest { font-size: 13px; color: var(--text-secondary); margin: 6px 0; }
         .exercise-card-latest strong { color: var(--text-primary); font-family: var(--font-mono); font-size: 14px; }
         .entry-list { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
         .entry-list.expanded { max-height: 600px; overflow-y: auto; }
-        .entry-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: var(--bg-elevated); margin-top: 5px; border-radius: var(--radius-sm); font-size: 13px; }
+        .entry-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; background: rgba(255,255,255,0.30); margin-top: 6px; border-radius: var(--radius-sm); font-size: 13px; border: 1px solid rgba(255,255,255,0.15); }
         .entry-item-info { flex: 1; }
         .entry-item-info strong { font-family: var(--font-mono); font-size: 13px; }
         .entry-item-date { color: var(--text-muted); font-size: 12px; }
@@ -190,32 +206,32 @@
 
         /* ─── Muscle Headers ─── */
         .muscle-header { display: flex; align-items: center; gap: 8px; padding: 8px 0 4px; margin-top: 8px; font-weight: 700; font-size: 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; }
-        .muscle-header::after { content:''; flex:1; height:1px; background:var(--border); }
+        .muscle-header::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.25); }
 
         /* ─── Today ─── */
         .today-section-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
-        .today-card { background: var(--bg-card); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; }
+        .today-card { background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; border: var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-inner-glow); display: flex; justify-content: space-between; align-items: center; }
         .today-card-info { flex: 1; }
         .today-card-name { font-weight: 600; font-size: 14px; }
         .today-card-stats { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--accent); text-align: right; }
         .today-card-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
         /* ─── Exercise List ─── */
-        .exercise-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: var(--bg-elevated); margin-bottom: 5px; border-radius: var(--radius-sm); }
+        .exercise-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255,255,255,0.30); margin-bottom: 6px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.15); }
         .exercise-list-name { font-weight: 600; font-size: 14px; }
         .exercise-list-details { display: flex; gap: 6px; margin-top: 3px; }
 
         /* ─── Modals ─── */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); z-index: 1000; align-items: flex-end; justify-content: center; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.25); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
-        .modal-sheet { background: var(--bg-card); border-radius: 16px 16px 0 0; padding: 20px 20px calc(20px + var(--safe-bottom)); width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; animation: slideUp .3s ease; }
+        .modal-sheet { background: rgba(255,255,255,0.80); backdrop-filter: blur(40px) saturate(2); -webkit-backdrop-filter: blur(40px) saturate(2); border-radius: 24px 24px 0 0; padding: 24px 24px calc(24px + var(--safe-bottom)); width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; animation: slideUp .3s ease; border: 1px solid rgba(255,255,255,0.35); border-bottom: none; box-shadow: 0 -8px 40px rgba(0,0,0,0.08), inset 0 1px 1px rgba(255,255,255,0.5); }
         @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-        .modal-handle { width: 36px; height: 4px; background: var(--border-strong); border-radius: 2px; margin: 0 auto 14px; }
+        .modal-handle { width: 40px; height: 5px; background: rgba(0,0,0,0.12); border-radius: 3px; margin: 0 auto 16px; }
         .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; }
 
         /* ─── Toast ─── */
         .toast-container { position: fixed; top: calc(var(--safe-top) + 12px); left: 50%; transform: translateX(-50%); z-index: 2000; pointer-events: none; }
-        .toast { background: var(--bg-card); color: var(--text-primary); padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 500; box-shadow: 0 6px 24px rgba(0,0,0,0.12); border: 1px solid var(--border); animation: toastIn .3s ease, toastOut .3s ease 2.5s forwards; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .toast { background: rgba(255,255,255,0.85); backdrop-filter: blur(24px) saturate(1.8); -webkit-backdrop-filter: blur(24px) saturate(1.8); color: var(--text-primary); padding: 12px 20px; border-radius: 14px; font-size: 14px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.10); border: 1px solid rgba(255,255,255,0.30); animation: toastIn .3s ease, toastOut .3s ease 2.5s forwards; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .toast-success { border-left: 3px solid var(--green); }
         .toast-error { border-left: 3px solid var(--red); }
         .toast-info { border-left: 3px solid var(--accent); }
@@ -227,34 +243,37 @@
         .empty-state-icon { font-size: 36px; margin-bottom: 10px; opacity: .5; }
         .empty-state-text { font-size: 14px; }
         .summary-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        .summary-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; box-shadow: var(--shadow-sm); }
+        .summary-item { background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border: var(--glass-border); border-radius: var(--radius); padding: 14px; text-align: center; box-shadow: var(--glass-shadow), var(--glass-inner-glow); }
         .summary-value { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--accent); }
         .summary-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
         .filter-bar { margin-bottom: 12px; }
-        .radio-option { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--bg-elevated); border: 1.5px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; cursor: pointer; }
-        .radio-option:has(input:checked) { border-color: var(--accent); background: var(--accent-light); }
+        .radio-option { display: flex; align-items: center; gap: 10px; padding: 14px; background: rgba(255,255,255,0.35); border: 1.5px solid rgba(255,255,255,0.25); border-radius: var(--radius-sm); margin-bottom: 8px; cursor: pointer; transition: background .2s, border-color .2s; }
+        .radio-option:has(input:checked) { border-color: rgba(13,148,136,0.5); background: rgba(13,148,136,0.10); }
         .radio-option input[type="radio"] { width: auto; accent-color: var(--accent); }
         .radio-option label { font-size: 14px; font-weight: 500; cursor: pointer; margin: 0; }
         .radio-option .option-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-        input[type="file"] { padding: 10px; font-size: 14px; background: var(--bg-input); border: 1.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); width: 100%; }
-        .confirm-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.3); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); z-index:3000; align-items:center; justify-content:center; }
+        input[type="file"] { padding: 10px; font-size: 14px; background: rgba(255,255,255,0.45); border: 1.5px solid rgba(255,255,255,0.25); border-radius: var(--radius-sm); color: var(--text-primary); width: 100%; }
+        .confirm-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.25); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:3000; align-items:center; justify-content:center; }
         .confirm-overlay.active { display:flex; }
-        .confirm-box { background:var(--bg-card); border-radius:var(--radius); padding:24px; max-width:320px; width:90%; text-align:center; border:1px solid var(--border); box-shadow:var(--shadow); }
+        .confirm-box { background:rgba(255,255,255,0.85); backdrop-filter:blur(40px) saturate(2); -webkit-backdrop-filter:blur(40px) saturate(2); border-radius:20px; padding:28px; max-width:320px; width:90%; text-align:center; border:1px solid rgba(255,255,255,0.35); box-shadow:0 16px 48px rgba(0,0,0,0.10), inset 0 1px 1px rgba(255,255,255,0.5); }
         .confirm-box p { font-size:15px; margin-bottom:18px; line-height:1.5; color:var(--text-secondary); }
         .confirm-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
         input[type="number"] { -moz-appearance: textfield; }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.10); border-radius: 3px; }
 
         /* ─── History ─── */
         .muscle-coverage-summary {
             background: var(--bg-card);
-            border: 1px solid var(--border);
+            backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+            -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+            border: var(--glass-border);
             border-radius: var(--radius);
-            padding: 16px;
+            padding: 18px;
             margin-bottom: 16px;
+            box-shadow: var(--glass-shadow), var(--glass-inner-glow);
         }
         .coverage-title {
             font-size: 13px;
@@ -276,8 +295,10 @@
             font-size: 12px;
             font-weight: 600;
             border-radius: 20px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.45);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.25);
             color: var(--accent-text);
             cursor: pointer;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='%2364748b'%3E%3Cpath d='M5 6L0 0h10z'/%3E%3C/svg%3E");
@@ -286,13 +307,14 @@
         }
         .coverage-days-dropdown:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: rgba(13,148,136,0.5);
             box-shadow: 0 0 0 2px var(--accent-glow);
         }
         .coverage-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 4px 0;
+            line-height: 1.8;
         }
         .coverage-tag {
             font-size: 11px;
@@ -301,17 +323,25 @@
             font-weight: 600;
         }
         .coverage-tag.hit-primary {
-            background: var(--accent);
+            background: rgba(13,148,136,0.85);
             color: white;
+            border: 1px solid rgba(255,255,255,0.15);
         }
         .coverage-tag.hit-secondary {
-            background: var(--accent-light);
+            background: rgba(13,148,136,0.12);
             color: var(--accent-text);
+            border: 1px solid rgba(13,148,136,0.15);
         }
         .coverage-tag.not-hit {
-            background: var(--bg-elevated);
+            background: rgba(255,255,255,0.35);
             color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.20);
         }
+        .coverage-group { display: inline; }
+        .coverage-group-label { display: inline; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+        .coverage-group-tags { display: inline; }
+        .coverage-group-tags .coverage-tag { margin-right: 2px; }
+        .coverage-group::after { content: ''; display: inline-block; width: 6px; }
         .coverage-legend {
             display: flex;
             gap: 12px;
@@ -330,14 +360,14 @@
             border-radius: 50%;
         }
         .legend-dot.primary { background: var(--accent); }
-        .legend-dot.secondary { background: var(--accent-light); border: 1px solid var(--accent); }
-        .legend-dot.none { background: var(--bg-elevated); border: 1px solid var(--border); }
+        .legend-dot.secondary { background: rgba(13,148,136,0.12); border: 1px solid var(--accent); }
+        .legend-dot.none { background: rgba(255,255,255,0.35); border: 1px solid rgba(255,255,255,0.40); }
 
         .week-block { margin-bottom: 20px; }
         .week-header {
             display: flex; justify-content: space-between; align-items: baseline;
             padding: 8px 0 6px; margin-bottom: 8px;
-            border-bottom: 2px solid var(--accent);
+            border-bottom: 2px solid rgba(13,148,136,0.50);
         }
         .week-title { font-weight: 700; font-size: 15px; color: var(--text-primary); }
         .week-range { font-size: 12px; color: var(--text-muted); }
@@ -345,8 +375,8 @@
         .week-stats span { display: inline-flex; align-items: center; gap: 3px; }
 
         .day-card {
-            background: var(--bg-card); border-radius: var(--radius); padding: 14px 16px;
-            margin-bottom: 8px; border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+            background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border-radius: var(--radius); padding: 16px 18px;
+            margin-bottom: 10px; border: var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-inner-glow);
         }
         .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .day-date { font-weight: 700; font-size: 14px; }
@@ -354,7 +384,7 @@
         .day-muscles .tag { font-size: 10px; padding: 1px 7px; }
         .day-exercise-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 6px 0; border-top: 1px solid var(--border); font-size: 13px;
+            padding: 6px 0; border-top: 1px solid rgba(255,255,255,0.15); font-size: 13px;
         }
         .day-exercise-row:first-of-type { border-top: none; }
         .day-ex-name { font-weight: 500; color: var(--text-primary); }
@@ -363,7 +393,7 @@
 
         .day-volume-row {
             display: flex; justify-content: flex-end; gap: 12px;
-            padding-top: 6px; margin-top: 4px; border-top: 1px dashed var(--border);
+            padding-top: 6px; margin-top: 4px; border-top: 1px dashed rgba(0,0,0,0.08);
             font-size: 11px; color: var(--text-muted); font-weight: 600;
         }
 
@@ -389,7 +419,7 @@
             .today-section-title { grid-column: 1 / -1; }
             .summary-bar { max-width: 480px; }
             .modal-overlay { align-items: center; }
-            .modal-sheet { border-radius: var(--radius); max-width: 440px; }
+            .modal-sheet { border-radius: 20px; max-width: 440px; }
             .modal-handle { display: none; }
             .tab-btn { font-size: 11px; }
             .tab-btn svg { width: 23px; height: 23px; }
@@ -661,8 +691,8 @@
     let exercises = [...defaultExercises];
     let workoutData = [];
     // ═══ Chart.js Light Theme ═══
-    Chart.defaults.color = '#94a3b8';
-    Chart.defaults.borderColor = '#e2e8f0';
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.borderColor = 'rgba(255,255,255,0.20)';
     Chart.defaults.font.family = "'DM Sans', sans-serif";
 
     // ═══ Helpers ═══
@@ -699,22 +729,36 @@
         cutoff.setDate(today.getDate() - coverageDays);
         const cutoffStr = localDateStr(cutoff);
 
-        // Dynamically build muscle groups from all exercises
+        // Fixed muscle-to-group mapping
+        const muscleToGroup = {
+            'Chest': 'Chest', 'Upper Chest': 'Chest',
+            'Lats': 'Back', 'Rhomboids': 'Back', 'Traps': 'Back',
+            'Front Delts': 'Shoulders', 'Side Delts': 'Shoulders', 'Rear Delts': 'Shoulders',
+            'Biceps': 'Arms', 'Triceps': 'Arms', 'Forearms': 'Arms',
+            'Quads': 'Legs', 'Hamstrings': 'Legs', 'Glutes': 'Legs', 'Calves': 'Legs',
+            'Core': 'Core', 'Abs': 'Core', 'Lower Back': 'Core', 'Neck': 'Core'
+        };
+        const groupOrder = ['Legs', 'Core', 'Back', 'Chest', 'Shoulders', 'Arms'];
+        // Collect all muscles from exercises
         const allMuscleGroupsSet = new Set();
         exercises.forEach(ex => {
             if (ex.primary) ex.primary.forEach(m => allMuscleGroupsSet.add(m));
             if (ex.secondary) ex.secondary.forEach(m => allMuscleGroupsSet.add(m));
         });
-        const allMuscleGroups = Array.from(allMuscleGroupsSet).sort();
-        
-        if (allMuscleGroups.length === 0) {
-            container.style.display = 'none';
-            return;
-        }
-        
+        const allMuscles = Array.from(allMuscleGroupsSet);
+        if (allMuscles.length === 0) { container.style.display = 'none'; return; }
+        // Group muscles by category
+        const grouped = {};
+        allMuscles.forEach(m => {
+            const g = muscleToGroup[m] || 'Other';
+            if (!grouped[g]) grouped[g] = [];
+            grouped[g].push(m);
+        });
+        Object.keys(grouped).forEach(g => grouped[g].sort());
+
         const hitPrimary = new Set();
         const hitSecondary = new Set();
-        
+
         workoutData.forEach(entry => {
             if (entry.date && entry.date >= cutoffStr) {
                 const ex = exercises.find(e => e.name === entry.exercise && e.equipment === entry.equipment);
@@ -724,8 +768,7 @@
                 }
             }
         });
-        
-        const dayLabel = coverageDays === 1 ? 'Last 1 Day' : 'Last ' + coverageDays + ' Days';
+
         let html = '<div class="coverage-header-row"><div class="coverage-title">Muscle Coverage</div>';
         html += '<select id="coverage-days-select" class="coverage-days-dropdown" onchange="coverageDays=parseInt(this.value);renderLogMuscleCoverage();">';
         for (var i = 1; i <= 7; i++) {
@@ -733,15 +776,34 @@
         }
         html += '</select></div>';
         html += '<div class="coverage-grid">';
-        allMuscleGroups.forEach(m => {
-            if (hitPrimary.has(m)) {
-                html += '<span class="coverage-tag hit-primary">' + m + '</span>';
-            } else if (hitSecondary.has(m)) {
-                html += '<span class="coverage-tag hit-secondary">' + m + '</span>';
-            } else {
-                html += '<span class="coverage-tag not-hit">' + m + '</span>';
-            }
+        groupOrder.forEach(g => {
+            if (!grouped[g]) return;
+            html += '<div class="coverage-group">' + (grouped[g].length > 1 ? '<div class="coverage-group-label">' + g + '</div>' : '') + '<div class="coverage-group-tags">';
+            grouped[g].forEach(m => {
+                if (hitPrimary.has(m)) {
+                    html += '<span class="coverage-tag hit-primary">' + m + '</span>';
+                } else if (hitSecondary.has(m)) {
+                    html += '<span class="coverage-tag hit-secondary">' + m + '</span>';
+                } else {
+                    html += '<span class="coverage-tag not-hit">' + m + '</span>';
+                }
+            });
+            html += '</div></div>';
         });
+        // Show any ungrouped muscles
+        if (grouped['Other']) {
+            html += '<div class="coverage-group"><div class="coverage-group-label">Other</div><div class="coverage-group-tags">';
+            grouped['Other'].forEach(m => {
+                if (hitPrimary.has(m)) {
+                    html += '<span class="coverage-tag hit-primary">' + m + '</span>';
+                } else if (hitSecondary.has(m)) {
+                    html += '<span class="coverage-tag hit-secondary">' + m + '</span>';
+                } else {
+                    html += '<span class="coverage-tag not-hit">' + m + '</span>';
+                }
+            });
+            html += '</div></div>';
+        }
         html += '</div>';
         html += '<div class="coverage-legend">';
         html += '<span><span class="legend-dot primary"></span> Primary</span>';
@@ -1432,21 +1494,36 @@
             cutoff.setDate(today.getDate() - coverageDays);
             const cutoffStr = localDateStr(cutoff);
             
-            // Dynamically build muscle groups from all exercises
+            // Fixed muscle-to-group mapping
+            const hMuscleToGroup = {
+                'Chest': 'Chest', 'Upper Chest': 'Chest',
+                'Lats': 'Back', 'Rhomboids': 'Back', 'Traps': 'Back',
+                'Front Delts': 'Shoulders', 'Side Delts': 'Shoulders', 'Rear Delts': 'Shoulders',
+                'Biceps': 'Arms', 'Triceps': 'Arms', 'Forearms': 'Arms',
+                'Quads': 'Legs', 'Hamstrings': 'Legs', 'Glutes': 'Legs', 'Calves': 'Legs',
+                'Core': 'Core', 'Abs': 'Core', 'Lower Back': 'Core', 'Neck': 'Core'
+            };
+            const hGroupOrder = ['Legs', 'Core', 'Back', 'Chest', 'Shoulders', 'Arms'];
             const allMuscleGroupsSet = new Set();
             exercises.forEach(ex => {
                 if (ex.primary) ex.primary.forEach(m => allMuscleGroupsSet.add(m));
                 if (ex.secondary) ex.secondary.forEach(m => allMuscleGroupsSet.add(m));
             });
-            const allMuscleGroups = Array.from(allMuscleGroupsSet).sort();
-            
+            const allMuscles = Array.from(allMuscleGroupsSet);
+            const hGrouped = {};
+            allMuscles.forEach(m => {
+                const g = hMuscleToGroup[m] || 'Other';
+                if (!hGrouped[g]) hGrouped[g] = [];
+                hGrouped[g].push(m);
+            });
+            Object.keys(hGrouped).forEach(g => hGrouped[g].sort());
+
             const hitPrimary = new Set();
             const hitSecondary = new Set();
-            
+
             dates.forEach(dateStr => {
                 if (dateStr >= cutoffStr) {
                     byDate[dateStr].forEach(entry => {
-                        // Find the exercise in our list
                         const ex = exercises.find(e => e.name === entry.exercise && e.equipment === entry.equipment);
                         if (ex) {
                             if (ex.primary) ex.primary.forEach(m => hitPrimary.add(m));
@@ -1479,15 +1556,33 @@
             }
             html += '</select></div>';
             html += '<div class="coverage-grid">';
-            allMuscleGroups.forEach(m => {
-                if (hitPrimary.has(m)) {
-                    html += '<span class="coverage-tag hit-primary">' + m + '</span>';
-                } else if (hitSecondary.has(m)) {
-                    html += '<span class="coverage-tag hit-secondary">' + m + '</span>';
-                } else {
-                    html += '<span class="coverage-tag not-hit">' + m + '</span>';
-                }
+            hGroupOrder.forEach(g => {
+                if (!hGrouped[g]) return;
+                html += '<div class="coverage-group">' + (hGrouped[g].length > 1 ? '<div class="coverage-group-label">' + g + '</div>' : '') + '<div class="coverage-group-tags">';
+                hGrouped[g].forEach(m => {
+                    if (hitPrimary.has(m)) {
+                        html += '<span class="coverage-tag hit-primary">' + m + '</span>';
+                    } else if (hitSecondary.has(m)) {
+                        html += '<span class="coverage-tag hit-secondary">' + m + '</span>';
+                    } else {
+                        html += '<span class="coverage-tag not-hit">' + m + '</span>';
+                    }
+                });
+                html += '</div></div>';
             });
+            if (hGrouped['Other']) {
+                html += '<div class="coverage-group"><div class="coverage-group-label">Other</div><div class="coverage-group-tags">';
+                hGrouped['Other'].forEach(m => {
+                    if (hitPrimary.has(m)) {
+                        html += '<span class="coverage-tag hit-primary">' + m + '</span>';
+                    } else if (hitSecondary.has(m)) {
+                        html += '<span class="coverage-tag hit-secondary">' + m + '</span>';
+                    } else {
+                        html += '<span class="coverage-tag not-hit">' + m + '</span>';
+                    }
+                });
+                html += '</div></div>';
+            }
             html += '</div>';
             html += '<div class="coverage-legend">';
             html += '<span><span class="legend-dot primary"></span> Primary</span>';

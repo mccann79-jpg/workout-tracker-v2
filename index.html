@@ -312,9 +312,8 @@
         }
         .coverage-grid {
             display: flex;
-            flex-wrap: wrap;
-            gap: 4px 0;
-            line-height: 1.8;
+            flex-direction: column;
+            gap: 6px;
         }
         .coverage-tag {
             font-size: 11px;
@@ -337,10 +336,9 @@
             color: var(--text-muted);
             border: 1px solid rgba(255,255,255,0.20);
         }
-        .coverage-group { display: inline; margin-right: 6px; }
-        .coverage-group-label { display: inline; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
-        .coverage-group-tags { display: inline; }
-        .coverage-group-tags .coverage-tag { margin-right: 2px; }
+        .coverage-group { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+        .coverage-group-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; min-width: fit-content; }
+        .coverage-group-tags { display: flex; flex-wrap: wrap; gap: 4px; }
         .coverage-legend {
             display: flex;
             gap: 12px;

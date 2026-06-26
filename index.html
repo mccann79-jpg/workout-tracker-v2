@@ -438,6 +438,43 @@
             .page { padding: 28px 56px 40px; }
             #progress-container { grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
         }
+
+        /* ─── Guide ─── */
+        .guide-intro { margin-bottom: 16px; }
+        .guide-intro h2 { font-size: 22px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+        .guide-intro h2 em { font-style: normal; color: var(--accent); }
+        .guide-intro p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+        .guide-principles { display: grid; gap: 10px; margin-bottom: 14px; }
+        @media (min-width: 768px) { .guide-principles { grid-template-columns: repeat(3, 1fr); } }
+        .principle { background: rgba(255,255,255,0.30); border: 1px solid rgba(255,255,255,0.20); border-left: 3px solid var(--accent); border-radius: var(--radius-sm); padding: 12px 14px; }
+        .principle-label { font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .principle-body { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; }
+        .guide-section-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin: 18px 0 10px; }
+        .guide-muscles { display: grid; gap: 10px; }
+        @media (min-width: 768px) { .guide-muscles { grid-template-columns: 1fr 1fr; } }
+        @media (min-width: 1024px) { .guide-muscles { grid-template-columns: 1fr 1fr 1fr; } }
+        .guide-muscle-card { background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border: var(--glass-border); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--glass-shadow), var(--glass-inner-glow); }
+        .guide-muscle-name { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.20); }
+        .guide-ex { padding: 7px 0; border-top: 1px solid rgba(255,255,255,0.12); }
+        .guide-ex:first-child { border-top: none; padding-top: 0; }
+        .guide-ex-name { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+        .guide-ex-note { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+        .gtag { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: .4px; padding: 1px 6px; border-radius: 5px; text-transform: uppercase; margin-left: 5px; vertical-align: middle; }
+        .gtag-stretch { background: rgba(22,163,74,0.14); color: var(--green); }
+        .gtag-cable { background: rgba(37,99,235,0.12); color: #1d4ed8; }
+        .gtag-compound { background: rgba(217,119,6,0.14); color: var(--yellow); }
+        .guide-cvd-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.15); }
+        .guide-cvd-row:first-child { border-top: none; }
+        .guide-cvd-ex { flex: 0 0 38%; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .guide-cvd-body { flex: 1; }
+        .guide-cvd-why { font-size: 11.5px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+        .verdict { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .4px; padding: 1px 7px; border-radius: 5px; text-transform: uppercase; }
+        .verdict-cable { background: rgba(37,99,235,0.12); color: #1d4ed8; }
+        .verdict-db { background: rgba(217,119,6,0.14); color: var(--yellow); }
+        .verdict-either { background: rgba(22,163,74,0.14); color: var(--green); }
+        .guide-use p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 8px; }
+        .guide-use p:last-child { margin-bottom: 0; }
+        .guide-use strong { color: var(--text-primary); font-weight: 700; }
     </style>
 </head>
 <body>
@@ -548,6 +585,103 @@
                     <button onclick="clearAllData()" class="btn btn-danger">Clear All Data</button>
                 </div>
             </div></div>
+
+            <!-- GUIDE -->
+            <div id="guide-page" class="page"><div class="page-inner">
+                <div class="guide-intro">
+                    <h2>Build muscle with <em>intention</em></h2>
+                    <p>A reference for exercise selection, muscle targeting, and equipment choice — built around the principle that loaded stretch drives growth.</p>
+                </div>
+
+                <div class="guide-principles">
+                    <div class="principle"><div class="principle-label">First principle</div><div class="principle-body">Consistency and volume matter more than exercise selection — especially early on.</div></div>
+                    <div class="principle"><div class="principle-label">Key insight</div><div class="principle-body">Muscles loaded in a lengthened position grow faster. Build selection around this.</div></div>
+                    <div class="principle"><div class="principle-label">The target</div><div class="principle-body">10–20 hard sets per muscle group per week, with progressive overload over time.</div></div>
+                </div>
+
+                <div class="guide-section-title">Exercise Library</div>
+                <div class="guide-muscles">
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Chest</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Incline Dumbbell Press <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Upper chest emphasis, good lengthened load</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Cable Fly / Pec Deck <span class="gtag gtag-cable">cable</span></div><div class="guide-ex-note">Best stretch-focused chest isolation</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Dips <span class="gtag gtag-compound">compound</span></div><div class="guide-ex-note">Lower chest, deep stretch at bottom</div></div>
+                    </div>
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Back — Width</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Pull-ups / Lat Pulldown <span class="gtag gtag-compound">compound</span></div><div class="guide-ex-note">Long head lats, primary width builder</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Straight-Arm Pulldown <span class="gtag gtag-cable">cable</span></div><div class="guide-ex-note">Lat isolation, constant tension</div></div>
+                    </div>
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Back — Thickness</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Incline / Chest-Supported Row <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Rhomboids, mid-traps — no cheating</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Seal Row / Meadows Row <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Lengthened position, eliminates hip drive</div></div>
+                    </div>
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Shoulders</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Cable Lateral Raise <span class="gtag gtag-cable">cable</span> <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Best mid-delt exercise — do every session</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Dumbbell / Machine OHP <span class="gtag gtag-compound">compound</span></div><div class="guide-ex-note">Front delt, primary mass builder</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Rear Delt Fly — Cable or Reverse Pec Deck</div><div class="guide-ex-note">Rear delt isolation, essential for balance</div></div>
+                    </div>
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Biceps</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Incline Dumbbell Curl <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Best single bicep exercise — lengthened at bottom</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Hammer Curl</div><div class="guide-ex-note">Brachialis focus, adds arm thickness</div></div>
+                    </div>
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Triceps</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Overhead Tricep Extension <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Long head, best tricep mass builder</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Tricep Pushdown <span class="gtag gtag-cable">cable</span></div><div class="guide-ex-note">Lateral head, great for volume and pump</div></div>
+                    </div>
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Quads</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Hack Squat / High-Foot Leg Press <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Lengthened quad position, primary mass builder</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Bulgarian Split Squat <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Unilateral, deep quad stretch</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Leg Extension</div><div class="guide-ex-note">Isolation, excellent for pump and volume</div></div>
+                    </div>
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Hamstrings</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Romanian Deadlift <span class="gtag gtag-stretch">stretch</span> <span class="gtag gtag-compound">compound</span></div><div class="guide-ex-note">Best hamstring exercise, deep lengthened load</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Seated Leg Curl <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Seated &gt; lying — more lengthened position</div></div>
+                    </div>
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Glutes</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Hip Thrust / Glute Bridge <span class="gtag gtag-compound">compound</span></div><div class="guide-ex-note">Peak contraction, best glute activator</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Bulgarian Split Squat <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Glutes loaded in lengthened position</div></div>
+                    </div>
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Calves</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Seated Calf Raise <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Soleus — knee bent, deep stretch essential</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Standing Calf Raise</div><div class="guide-ex-note">Gastrocnemius — leg straight</div></div>
+                    </div>
+                    <div class="guide-muscle-card">
+                        <div class="guide-muscle-name">Abs</div>
+                        <div class="guide-ex"><div class="guide-ex-name">Cable Crunch <span class="gtag gtag-cable">cable</span></div><div class="guide-ex-note">Loaded flexion, lengthened at top</div></div>
+                        <div class="guide-ex"><div class="guide-ex-name">Hanging Leg Raise <span class="gtag gtag-stretch">stretch</span></div><div class="guide-ex-note">Hip flexors + lower abs, full range</div></div>
+                    </div>
+                </div>
+
+                <div class="guide-section-title">Cable vs. Dumbbell</div>
+                <div class="card">
+                    <p style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;"><strong style="color:var(--text-primary);">Cables</strong> give constant tension through the full range. <strong style="color:var(--text-primary);">Dumbbells</strong> follow a strength curve — resistance peaks mid-rep and drops at the stretch. For muscles best loaded when lengthened, cables win. For compound pressing and rowing, the difference is minor.</p>
+                    <div class="guide-cvd-row"><div class="guide-cvd-ex">Lateral Raise</div><div class="guide-cvd-body"><span class="verdict verdict-cable">Cable</span><div class="guide-cvd-why">Dumbbell tension drops to near zero at the bottom where the delt is most stretched. Biggest practical difference here.</div></div></div>
+                    <div class="guide-cvd-row"><div class="guide-cvd-ex">Bicep Curl (standing)</div><div class="guide-cvd-body"><span class="verdict verdict-cable">Cable</span><div class="guide-cvd-why">Cable holds tension at both ends; dumbbell goes slack at full extension.</div></div></div>
+                    <div class="guide-cvd-row"><div class="guide-cvd-ex">Incline Curl</div><div class="guide-cvd-body"><span class="verdict verdict-either">Either</span><div class="guide-cvd-why">The incline lengthens the bicep where the dumbbell still loads well. A low cable works equally.</div></div></div>
+                    <div class="guide-cvd-row"><div class="guide-cvd-ex">Chest Fly</div><div class="guide-cvd-body"><span class="verdict verdict-cable">Cable</span><div class="guide-cvd-why">Same logic as lateral raises — dumbbell peaks at the wrong point, cable is continuous.</div></div></div>
+                    <div class="guide-cvd-row"><div class="guide-cvd-ex">Rear Delt Fly</div><div class="guide-cvd-body"><span class="verdict verdict-cable">Cable</span><div class="guide-cvd-why">Cable or reverse pec deck holds tension. Dumbbell rear flys load poorly.</div></div></div>
+                    <div class="guide-cvd-row"><div class="guide-cvd-ex">Overhead Tricep Ext.</div><div class="guide-cvd-body"><span class="verdict verdict-either">Either</span><div class="guide-cvd-why">Both load the long head lengthened. Cable is slightly more consistent; dumbbell is fine.</div></div></div>
+                    <div class="guide-cvd-row"><div class="guide-cvd-ex">Rows</div><div class="guide-cvd-body"><span class="verdict verdict-either">Either</span><div class="guide-cvd-why">Minimal difference. Use whichever is available or more comfortable.</div></div></div>
+                    <div class="guide-cvd-row"><div class="guide-cvd-ex">Press (chest, shoulder)</div><div class="guide-cvd-body"><span class="verdict verdict-db">Dumbbell</span><div class="guide-cvd-why">Greater range and independent arms. Barbell also fine; cable pressing is awkward.</div></div></div>
+                </div>
+
+                <div class="guide-section-title">How to Use This</div>
+                <div class="card guide-use">
+                    <p>You don't train all 20–25 exercises every session. This is a pool to draw from — on any day, pick 4–6 movements that hit the target muscles, rotating to hit each muscle 2×/week.</p>
+                    <p><strong>Upper day:</strong> Cable lateral raise → Incline DB press → Chest-supported row → Incline DB curl → Overhead tricep ext → Rear delt fly</p>
+                    <p><strong>Lower day:</strong> Romanian deadlift → Hack squat → Seated leg curl → Bulgarian split squat → Seated calf raise → Cable crunch</p>
+                    <p>Priority order: <strong>progressive overload first, exercise selection second.</strong> Getting stronger on these movements over months is the mechanism of growth.</p>
+                </div>
+            </div></div>
         </div>
 
         <div class="bottom-nav">
@@ -555,6 +689,7 @@
             <button class="tab-btn" onclick="showPage('history',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>History</button>
             <button class="tab-btn" onclick="showPage('progress',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-4 4"/></svg>Progress</button>
 <button class="tab-btn" onclick="showPage('exercises',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Exercises</button>
+            <button class="tab-btn" onclick="showPage('guide',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Guide</button>
             <button class="tab-btn" onclick="showPage('data',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18m9-9H3"/><circle cx="12" cy="12" r="9"/></svg>Data</button>
         </div>
     </div>

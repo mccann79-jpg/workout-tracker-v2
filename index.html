@@ -120,6 +120,17 @@
         select optgroup { font-weight: 700; font-size: 12px; color: var(--accent); padding: 6px 0 2px; font-style: normal; }
         select optgroup option { font-weight: 400; font-size: 15px; color: var(--text-primary); padding-left: 8px; }
 
+        /* ─── Search field with clear button ─── */
+        .search-wrap { position: relative; }
+        .search-wrap input { padding-right: 40px; }
+        .search-clear {
+            position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+            width: 28px; height: 28px; padding: 0; border: none; border-radius: 50%;
+            background: rgba(0,0,0,0.06); color: var(--text-secondary); cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; transition: background .15s, color .15s;
+        }
+        .search-clear:hover, .search-clear:active { background: rgba(0,0,0,0.12); color: var(--text-primary); }
+
         /* ─── Custom Exercise Picker ─── */
         .exercise-picker {
             margin-top: 6px;
@@ -215,6 +226,33 @@
         .today-card-name { font-weight: 600; font-size: 14px; }
         .today-card-stats { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--accent); text-align: right; }
         .today-card-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ─── Session Builder ─── */
+        .session-card { background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; border: var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-inner-glow); border-left: 3px solid rgba(148,163,184,0.35); }
+        .session-card.done { border-left-color: var(--green); }
+        .session-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+        .session-name { font-weight: 600; font-size: 14px; line-height: 1.25; }
+        .session-equip { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .session-stats { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+        .session-stat { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: rgba(255,255,255,0.40); border: 1px solid rgba(255,255,255,0.25); color: var(--text-muted); font-weight: 600; letter-spacing: .3px; }
+        .session-stat strong { font-family: var(--font-mono); font-size: 12px; color: var(--text-primary); font-weight: 700; }
+        .session-stat .session-stat-date { color: var(--text-muted); font-weight: 500; }
+        .session-stat.is-pr { background: rgba(217,119,6,0.12); border-color: rgba(217,119,6,0.18); color: var(--yellow); }
+        .session-stat.is-pr strong { color: var(--yellow); }
+        .session-entry-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; margin-top: 10px; align-items: center; }
+        .session-entry-row input { padding: 10px 8px; font-size: 15px; text-align: center; font-family: var(--font-mono); font-weight: 700; }
+        .session-log-btn { width: 44px; height: 42px; padding: 0; flex-shrink: 0; }
+        .session-sets { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+        .session-set-chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 3px 5px 3px 9px; border-radius: 9px; background: rgba(13,148,136,0.10); color: var(--accent-text); border: 1px solid rgba(13,148,136,0.15); }
+        .session-set-chip.is-pr { background: rgba(217,119,6,0.12); color: var(--yellow); border-color: rgba(217,119,6,0.20); }
+        .session-set-chip button { background: none; border: none; color: currentColor; opacity: .45; cursor: pointer; padding: 0 2px; font-size: 13px; line-height: 1; font-family: var(--font); }
+        .session-set-chip button:hover { opacity: 1; }
+        .session-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; width: 30px; height: 30px; padding: 0; border-radius: 8px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; transition: background .15s, color .15s; }
+        .session-remove:hover:not([disabled]) { background: rgba(0,0,0,0.05); color: var(--text-primary); }
+        .session-remove[aria-label="Remove from session"]:hover { color: var(--red); }
+        .picker-add { width: 28px; height: 28px; flex-shrink: 0; margin-left: 10px; padding: 0; border-radius: 8px; border: 1px solid rgba(13,148,136,0.25); background: rgba(13,148,136,0.10); color: var(--accent-text); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background .15s; }
+        .picker-add:hover, .picker-add:active { background: rgba(13,148,136,0.25); }
+        .picker-add.in-session { background: rgba(22,163,74,0.14); border-color: rgba(22,163,74,0.28); color: var(--green); }
 
         /* ─── Exercise List ─── */
         .exercise-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255,255,255,0.30); margin-bottom: 6px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.15); }
@@ -502,7 +540,10 @@
                             <form id="workout-form">
                                 <div class="form-group">
                                     <label class="form-label">Exercise</label>
-                                    <input type="text" id="exercise-search" placeholder="Search exercises…" autocomplete="off">
+                                    <div class="search-wrap">
+                                        <input type="text" id="exercise-search" placeholder="Search exercises…" autocomplete="off">
+                                        <button type="button" id="exercise-search-clear" class="search-clear" style="display:none;" onclick="clearExerciseSearch()" aria-label="Clear search"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+                                    </div>
                                     <input type="hidden" id="exercise-select-value" required>
                                     <div id="exercise-picker" class="exercise-picker"></div>
                                 </div>
@@ -510,9 +551,10 @@
                                     <div class="form-group"><span class="tag tag-equipment" id="equipment-type"></span><span id="exercise-muscles-info" style="margin-left:8px;font-size:11px;"></span></div>
                                     <div id="last-workout-info" style="display:none;" class="last-entry-bar"></div>
                                     <div id="pr-workout-info" style="display:none;" class="last-entry-bar"></div>
+                                    <button type="button" class="btn btn-secondary" id="add-to-session-btn" onclick="addSelectedToSession()" style="margin-bottom:12px;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add to Session</button>
                                     <div class="input-row">
-                                        <div class="form-group"><label class="form-label">Weight (lbs)</label><input type="number" id="weight-input" step="0.5" placeholder="0" required inputmode="decimal"></div>
-                                        <div class="form-group"><label class="form-label">Max Reps</label><input type="number" id="reps-input" min="1" placeholder="0" required inputmode="numeric"></div>
+                                        <div class="form-group"><label class="form-label">Weight (lbs) <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;">optional</span></label><input type="number" id="weight-input" step="0.5" placeholder="0" inputmode="decimal"></div>
+                                        <div class="form-group"><label class="form-label">Max Reps</label><input type="number" id="reps-input" min="1" placeholder="0" inputmode="numeric"></div>
                                     </div>
                                     <div class="form-group"><label class="form-label">Date</label><input type="date" id="date-input" required></div>
                                     <button type="submit" class="btn btn-primary"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg> Log Set</button>
@@ -520,7 +562,10 @@
                             </form>
                         </div>
                     </div>
-                    <div id="todays-workouts-container"></div>
+                    <div>
+                        <div id="session-container"></div>
+                        <div id="todays-workouts-container"></div>
+                    </div>
                 </div>
             </div></div>
 
@@ -703,7 +748,7 @@
                 <input type="hidden" id="edit-entry-id">
                 <div class="form-group"><label class="form-label">Exercise</label><input type="text" id="edit-exercise-name" disabled style="opacity:.6;"></div>
                 <div class="input-row">
-                    <div class="form-group"><label class="form-label">Weight (lbs)</label><input type="number" id="edit-weight" step="0.5" required inputmode="decimal"></div>
+                    <div class="form-group"><label class="form-label">Weight (lbs) <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;">optional</span></label><input type="number" id="edit-weight" step="0.5" inputmode="decimal" placeholder="0"></div>
                     <div class="form-group"><label class="form-label">Max Reps</label><input type="number" id="edit-reps" min="1" required inputmode="numeric"></div>
                 </div>
                 <div class="form-group"><label class="form-label">Date</label><input type="date" id="edit-date" required></div>
@@ -815,6 +860,8 @@
         {muscle: "TRAPS", name: "Dumbbell Shrugs", equipment: "Dumbbells", primary: ["Traps"], secondary: ["Forearms"]},
         // ABS
         {muscle: "ABS", name: "Cable Crunch", equipment: "Cable", primary: ["Abs"], secondary: []},
+        {muscle: "ABS", name: "Hanging Leg Raise", equipment: "Bodyweight", primary: ["Abs", "Hip Flexors"], secondary: ["Obliques", "Forearms"]},
+        {muscle: "ABS", name: "Ab Wheel Rollout", equipment: "Ab Wheel", primary: ["Abs"], secondary: ["Obliques", "Lats", "Front Delts"]},
         // FOREARMS
         {muscle: "FOREARMS", name: "Dumbbell Wrist Curls/Extensions", equipment: "Dumbbells", primary: ["Forearms"], secondary: []},
         // NECK
@@ -830,16 +877,195 @@
 
     // ═══ Helpers ═══
     function localDateStr(d) { d = d || new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+    function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+
+    // Weight is optional — bodyweight/core work is logged as reps only.
+    function fmtSet(weight, reps) {
+        const w = Number(weight) || 0, r = Number(reps) || 0;
+        return w > 0 ? `${w} lbs × ${r}` : `${r} reps`;
+    }
+    function fmtSetShort(weight, reps) {
+        const w = Number(weight) || 0, r = Number(reps) || 0;
+        return w > 0 ? `${w}×${r}` : `${r}r`;
+    }
+    // Rank by weight first, then reps — so bodyweight sets still compare meaningfully.
+    function isBetterSet(a, b) {
+        const aw = Number(a.weight) || 0, bw = Number(b.weight) || 0;
+        if (aw !== bw) return aw > bw;
+        return (Number(a.reps) || 0) > (Number(b.reps) || 0);
+    }
+    function bestSet(sets) { return sets.reduce((best, s) => isBetterSet(s, best) ? s : best, sets[0]); }
+    function setTime(e) { return (e.timestamp && e.timestamp.seconds) || 0; }
+
+    // Last session + all-time PR for one exercise, plus everything logged today.
+    function exerciseStats(name, equipment) {
+        const today = localDateStr();
+        const hist = workoutData.filter(d => d.exercise === name && d.equipment === equipment);
+        const todaySets = hist.filter(d => d.date === today).sort((a, b) => setTime(a) - setTime(b));
+        const prior = hist.filter(d => d.date && d.date < today);
+        let last = null;
+        if (prior.length) {
+            const lastDate = prior.reduce((m, d) => d.date > m ? d.date : m, '');
+            const sets = prior.filter(d => d.date === lastDate);
+            last = { date: lastDate, top: bestSet(sets), count: sets.length };
+        }
+        return {
+            last,
+            pr: hist.length ? bestSet(hist) : null,
+            priorPR: prior.length ? bestSet(prior) : null,
+            todaySets
+        };
+    }
+
+    function refreshLogViews() { renderProgress(); renderTodaysWorkouts(); renderSession(); renderSummary(); renderLogMuscleCoverage(); }
+
+    // ═══ Session Builder ═══
+    // Exercises queued for today's workout. Weight/reps are filled in set by set
+    // during the session; drafts persist locally so a reload mid-workout is safe.
+    let sessionPlan = [];
+    const SESSION_KEY = 'lift-session-plan';
+
+    function loadSessionPlan() {
+        try {
+            const raw = localStorage.getItem(SESSION_KEY);
+            if (!raw) return;
+            const stored = JSON.parse(raw);
+            if (stored && stored.date === localDateStr() && Array.isArray(stored.items)) sessionPlan = stored.items;
+            else localStorage.removeItem(SESSION_KEY);
+        } catch (e) { console.error('Session load error:', e); }
+    }
+    function saveSessionPlan() {
+        try { localStorage.setItem(SESSION_KEY, JSON.stringify({ date: localDateStr(), items: sessionPlan })); }
+        catch (e) { console.error('Session save error:', e); }
+    }
+    function inSession(name, equipment) { return sessionPlan.some(it => it.name === name && it.equipment === equipment); }
+    function refreshPicker() { populateExerciseDropdown(document.getElementById('exercise-search').value); }
+
+    function addToSession(idx) {
+        const ex = exercises[idx];
+        if (!ex) return;
+        if (inSession(ex.name, ex.equipment)) { showToast(`${ex.name} is already in the session.`, 'info'); return; }
+        sessionPlan.push({ name: ex.name, equipment: ex.equipment, muscle: ex.muscle, weight: '', reps: '' });
+        saveSessionPlan();
+        renderSession();
+        refreshPicker();
+        showToast(`Added ${ex.name}`);
+    }
+    function addSelectedToSession() {
+        const v = document.getElementById('exercise-select-value').value;
+        if (v === '') { showToast('Select an exercise.', 'error'); return; }
+        addToSession(parseInt(v));
+    }
+    function removeFromSession(i) {
+        if (!sessionPlan[i]) return;
+        sessionPlan.splice(i, 1);
+        saveSessionPlan();
+        renderSession();
+        refreshPicker();
+    }
+    async function clearSession() {
+        if (!sessionPlan.length) return;
+        if (!await showConfirm('Clear the session? Sets you already logged are kept.')) return;
+        sessionPlan = [];
+        saveSessionPlan();
+        renderSession();
+        refreshPicker();
+    }
+    function setSessionDraft(i, field, value) {
+        if (sessionPlan[i]) { sessionPlan[i][field] = value; saveSessionPlan(); }
+    }
+    function moveInSession(i, delta) {
+        const j = i + delta;
+        if (!sessionPlan[i] || j < 0 || j >= sessionPlan.length) return;
+        [sessionPlan[i], sessionPlan[j]] = [sessionPlan[j], sessionPlan[i]];
+        saveSessionPlan();
+        renderSession();
+    }
+
+    async function logSessionSet(i) {
+        const item = sessionPlan[i];
+        if (!item) return;
+        const reps = parseInt(String(item.reps ?? '').trim());
+        if (!reps || reps < 1) { showToast('Enter reps for this set.', 'error'); return; }
+        const weightRaw = String(item.weight ?? '').trim();
+        const weight = weightRaw === '' ? 0 : parseFloat(weightRaw);
+        if (isNaN(weight) || weight < 0) { showToast('Enter a valid weight.', 'error'); return; }
+
+        const { priorPR } = exerciseStats(item.name, item.equipment);
+        const entry = { muscle: item.muscle, exercise: item.name, equipment: item.equipment, weight, reps, date: localDateStr(), timestamp: firebase.firestore.Timestamp.now() };
+        const saved = await saveData(entry);
+        if (!saved) return;
+        workoutData.push(entry);
+
+        const isPR = priorPR ? isBetterSet(entry, priorPR) : false;
+        showToast(isPR ? `🏆 PR! ${item.name}: ${fmtSet(weight, reps)}` : `${item.name}: ${fmtSet(weight, reps)}`);
+        item.reps = ''; // keep the weight so the next set is one field away
+        saveSessionPlan();
+        refreshLogViews();
+    }
+
+    function renderSession() {
+        const container = document.getElementById('session-container');
+        if (!sessionPlan.length) { container.innerHTML = ''; return; }
+
+        let html = `<div class="today-section-title" style="justify-content:space-between;">
+            <span>Session — ${sessionPlan.length} exercise${sessionPlan.length === 1 ? '' : 's'}</span>
+            <button class="btn btn-secondary btn-sm" onclick="clearSession()">Clear</button>
+        </div>`;
+
+        sessionPlan.forEach((item, i) => {
+            const { last, pr, priorPR, todaySets } = exerciseStats(item.name, item.equipment);
+
+            const lastHtml = last
+                ? `<span class="session-stat">Last <strong>${fmtSet(last.top.weight, last.top.reps)}</strong><span class="session-stat-date">${last.count > 1 ? ` · ${last.count} sets` : ''} · ${formatDate(last.date)}</span></span>`
+                : `<span class="session-stat">Last <strong>—</strong></span>`;
+            const prHtml = pr
+                ? `<span class="session-stat is-pr">PR <strong>${fmtSet(pr.weight, pr.reps)}</strong></span>`
+                : `<span class="session-stat">PR <strong>—</strong></span>`;
+
+            const setsHtml = todaySets.map(s => {
+                const isPR = priorPR ? isBetterSet(s, priorPR) : false;
+                return `<span class="session-set-chip${isPR ? ' is-pr' : ''}">${isPR ? '🏆' : ''}${fmtSetShort(s.weight, s.reps)}<button onclick='confirmDeleteEntry("${s.id}")' title="Delete set">×</button></span>`;
+            }).join('');
+
+            html += `
+                <div class="session-card${todaySets.length ? ' done' : ''}">
+                    <div class="session-head">
+                        <div style="flex:1;min-width:0;">
+                            <div class="session-name">${esc(item.name)}</div>
+                            <div class="session-equip">${esc(item.equipment)}${todaySets.length ? ` · ${todaySets.length} set${todaySets.length === 1 ? '' : 's'} today` : ''}</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:2px;flex-shrink:0;">
+                            <button class="session-remove" onclick="moveInSession(${i},-1)" aria-label="Move up" ${i === 0 ? 'disabled style="opacity:.25;"' : ''}><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg></button>
+                            <button class="session-remove" onclick="moveInSession(${i},1)" aria-label="Move down" ${i === sessionPlan.length - 1 ? 'disabled style="opacity:.25;"' : ''}><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+                            <button class="session-remove" onclick="removeFromSession(${i})" aria-label="Remove from session"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+                        </div>
+                    </div>
+                    <div class="session-stats">${lastHtml}${prHtml}</div>
+                    ${setsHtml ? `<div class="session-sets">${setsHtml}</div>` : ''}
+                    <div class="session-entry-row">
+                        <input type="number" step="0.5" inputmode="decimal" placeholder="lbs" value="${esc(item.weight ?? '')}" oninput="setSessionDraft(${i},'weight',this.value)" aria-label="Weight (optional)">
+                        <input type="number" min="1" inputmode="numeric" placeholder="reps" value="${esc(item.reps ?? '')}" oninput="setSessionDraft(${i},'reps',this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();logSessionSet(${i});}" aria-label="Reps">
+                        <button class="btn btn-primary session-log-btn" onclick="logSessionSet(${i})" aria-label="Log set"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></button>
+                    </div>
+                </div>`;
+        });
+
+        container.innerHTML = html;
+    }
 
     // ═══ Init ═══
     async function init() {
         populateExerciseDropdown();
         populateMuscleFilter();
         setTodayDate();
+        updateSearchClear();
+        loadSessionPlan();
         await loadCustomExercises();
         await loadData();
         renderProgress();
         renderTodaysWorkouts();
+        renderSession();
         renderExercisesList();
         renderSummary();
         renderHistory();
@@ -1014,7 +1240,9 @@
                         <div class="today-card-subtitle"><span class="tag tag-equipment" style="font-size:10px;padding:2px 6px;">${entry.equipment}</span></div>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <div class="today-card-stats">${entry.weight}<span style="font-size:12px;color:var(--text-muted);">lbs</span> × ${entry.reps}</div>
+                        <div class="today-card-stats">${(Number(entry.weight) || 0) > 0
+                            ? `${entry.weight}<span style="font-size:12px;color:var(--text-muted);">lbs</span> × ${entry.reps}`
+                            : `${entry.reps}<span style="font-size:12px;color:var(--text-muted);">reps</span>`}</div>
                         <div class="entry-actions">
                             <button class="btn btn-secondary btn-icon" onclick='editEntry(${JSON.stringify(entry).replace(/'/g, "&#39;")})'>
                                 <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -1078,14 +1306,20 @@
                 muscleInfo += '</div>';
             }
             
+            const queued = inSession(ex.name, ex.equipment);
             html += `<div class="picker-item${sel}" data-idx="${ex.idx}" onclick="selectExercise(${ex.idx})">
-                <div style="flex:1;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
                         <span>${ex.name}</span>
                         <span class="picker-equip">${ex.equipment}</span>
                     </div>
                     ${muscleInfo}
                 </div>
+                <button type="button" class="picker-add${queued ? ' in-session' : ''}" title="${queued ? 'Already in session' : 'Add to session'}" onclick="event.stopPropagation();addToSession(${ex.idx})">
+                    ${queued
+                        ? '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>'
+                        : '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'}
+                </button>
             </div>`;
             count++;
         });
@@ -1122,24 +1356,37 @@
         musclesInfo.innerHTML = muscleHtml;
         
         const prDiv = document.getElementById('pr-workout-info');
-        const hist = workoutData.filter(d => d.exercise === exercise.name && d.equipment === exercise.equipment).sort((a, b) => new Date(b.date) - new Date(a.date));
-        if (hist.length > 0) {
-            const last = hist[0];
-            lastWorkoutDiv.innerHTML = `Last: <strong>${last.weight} lbs × ${last.reps} reps</strong>&nbsp; ${formatDate(last.date)}`;
-            lastWorkoutDiv.style.display = 'flex';
-            const pr = hist.reduce((best, d) => (d.weight > best.weight || (d.weight === best.weight && d.reps > best.reps)) ? d : best, hist[0]);
-            prDiv.innerHTML = `PR: <strong>${pr.weight} lbs × ${pr.reps} reps</strong>&nbsp; ${formatDate(pr.date)}`;
+        const { last, pr } = exerciseStats(exercise.name, exercise.equipment);
+        if (last) {
+            lastWorkoutDiv.innerHTML = `Last: <strong>${fmtSet(last.top.weight, last.top.reps)}</strong>&nbsp; ${formatDate(last.date)}`;
+        } else {
+            lastWorkoutDiv.innerHTML = pr ? 'No sets before today' : 'No previous workouts recorded';
+        }
+        lastWorkoutDiv.style.display = 'flex';
+        if (pr) {
+            prDiv.innerHTML = `PR: <strong>${fmtSet(pr.weight, pr.reps)}</strong>&nbsp; ${formatDate(pr.date)}`;
             prDiv.style.display = 'flex';
         } else {
-            lastWorkoutDiv.innerHTML = 'No previous workouts recorded';
-            lastWorkoutDiv.style.display = 'flex';
             prDiv.style.display = 'none';
         }
         details.style.display = 'block';
     }
 
+    function updateSearchClear() {
+        const input = document.getElementById('exercise-search');
+        document.getElementById('exercise-search-clear').style.display = input.value ? 'inline-flex' : 'none';
+    }
+    function clearExerciseSearch() {
+        const input = document.getElementById('exercise-search');
+        input.value = '';
+        populateExerciseDropdown('');
+        updateSearchClear();
+        input.focus();
+    }
+
     document.getElementById('exercise-search').addEventListener('input', function() {
         populateExerciseDropdown(this.value);
+        updateSearchClear();
     });
 
     // ═══ Add/Edit Custom Exercise ═══
@@ -1468,24 +1715,29 @@
         e.preventDefault();
         const exerciseIdx = document.getElementById('exercise-select-value').value;
         if (!exerciseIdx && exerciseIdx !== 0) { showToast('Select an exercise.', 'error'); return; }
-        const weight = parseFloat(document.getElementById('weight-input').value);
-        const reps = parseInt(document.getElementById('reps-input').value);
+        const weightRaw = document.getElementById('weight-input').value.trim();
+        const repsRaw = document.getElementById('reps-input').value.trim();
+        if (!repsRaw) { showToast('Enter reps, or use "Add to Session".', 'error'); return; }
+        const reps = parseInt(repsRaw);
+        if (!reps || reps < 1) { showToast('Enter valid reps.', 'error'); return; }
+        // Weight is optional — blank means bodyweight/unweighted.
+        const weight = weightRaw === '' ? 0 : parseFloat(weightRaw);
+        if (isNaN(weight) || weight < 0) { showToast('Enter a valid weight.', 'error'); return; }
         const date = document.getElementById('date-input').value;
         const exercise = exercises[exerciseIdx];
+        const { priorPR } = exerciseStats(exercise.name, exercise.equipment);
         const entry = { muscle: exercise.muscle, exercise: exercise.name, equipment: exercise.equipment, weight, reps, date, timestamp: firebase.firestore.Timestamp.now() };
         const saved = await saveData(entry);
         if (!saved) return;
         workoutData.push(entry);
-        const allForExercise = workoutData.filter(d => d.exercise === exercise.name && d.equipment === exercise.equipment);
-        const maxWeight = Math.max(...allForExercise.map(d => d.weight));
-        const isPR = weight >= maxWeight && allForExercise.length > 1;
-        showToast(isPR ? `🏆 PR! ${exercise.name}: ${weight} lbs × ${reps}` : `${exercise.name}: ${weight} lbs × ${reps}`);
+        const isPR = priorPR ? isBetterSet(entry, priorPR) : false;
+        showToast(isPR ? `🏆 PR! ${exercise.name}: ${fmtSet(weight, reps)}` : `${exercise.name}: ${fmtSet(weight, reps)}`);
         document.getElementById('weight-input').value = '';
         document.getElementById('reps-input').value = '';
         setTodayDate();
         // Re-select same exercise to refresh last workout info
         selectExercise(parseInt(exerciseIdx));
-        renderProgress(); renderTodaysWorkouts(); renderSummary(); renderLogMuscleCoverage();
+        refreshLogViews();
     });
 
     // ═══ Page Navigation ═══
@@ -1521,7 +1773,9 @@
             card.className = 'exercise-card';
             const sorted = [...exerciseData].sort((a, b) => new Date(a.date) - new Date(b.date));
             const latest = sorted[sorted.length - 1];
-            const maxWeight = Math.max(...sorted.map(d => d.weight));
+            const best = bestSet(sorted);
+            const latestIsBest = !isBetterSet(best, latest);
+            const weighted = sorted.some(d => (Number(d.weight) || 0) > 0);
             const cardId = `card-${exercise.name}-${exercise.equipment}`.replace(/[^a-zA-Z0-9-]/g, '-');
             
             // Build muscle targets HTML
@@ -1535,12 +1789,12 @@
             
             card.innerHTML = `
                 <div class="exercise-card-header"><div class="exercise-card-name">${exercise.name}</div><button class="btn btn-secondary btn-sm" onclick="toggleEntries('${cardId}')">${exerciseData.length} entries</button></div>
-                <div style="margin-bottom:4px;"><span class="tag tag-equipment">${exercise.equipment}</span>${latest.weight >= maxWeight ? ' <span class="tag tag-pr">PR</span>' : ''}</div>
+                <div style="margin-bottom:4px;"><span class="tag tag-equipment">${exercise.equipment}</span>${latestIsBest ? ' <span class="tag tag-pr">PR</span>' : ''}</div>
                 ${muscleTargetsHtml}
-                <div class="exercise-card-latest">Latest: <strong>${latest.weight} lbs × ${latest.reps}</strong> &nbsp;${formatDate(latest.date)}</div>
+                <div class="exercise-card-latest">Latest: <strong>${fmtSet(latest.weight, latest.reps)}</strong> &nbsp;${formatDate(latest.date)}<span style="opacity:.4;"> · </span>PR: <strong>${fmtSet(best.weight, best.reps)}</strong></div>
                 <div id="${cardId}" class="entry-list">
                     ${[...sorted].reverse().map(entry => `
-                        <div class="entry-item"><div class="entry-item-info"><strong>${entry.weight} lbs × ${entry.reps}</strong><span class="entry-item-date"> — ${formatDate(entry.date)}</span></div><div class="entry-actions"><button class="btn btn-secondary btn-icon" style="width:26px;height:26px;" onclick='editEntry(${JSON.stringify(entry).replace(/'/g, "&#39;")})'><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn btn-danger btn-icon" style="width:26px;height:26px;" onclick='confirmDeleteEntry("${entry.id}")'><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div></div>
+                        <div class="entry-item"><div class="entry-item-info"><strong>${fmtSet(entry.weight, entry.reps)}</strong><span class="entry-item-date"> — ${formatDate(entry.date)}</span></div><div class="entry-actions"><button class="btn btn-secondary btn-icon" style="width:26px;height:26px;" onclick='editEntry(${JSON.stringify(entry).replace(/'/g, "&#39;")})'><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn btn-danger btn-icon" style="width:26px;height:26px;" onclick='confirmDeleteEntry("${entry.id}")'><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div></div>
                     `).join('')}
                 </div>
                 <div class="chart-container"><canvas id="chart-${exercise.name}-${exercise.equipment}"></canvas></div>
@@ -1555,14 +1809,15 @@
                         {
                             label: 'Reps',
                             data: sorted.map(d => d.reps),
-                            backgroundColor: 'rgba(13, 148, 136, 0.1)',
-                            borderColor: 'rgba(13, 148, 136, 0.2)',
+                            backgroundColor: weighted ? 'rgba(13, 148, 136, 0.1)' : 'rgba(13, 148, 136, 0.35)',
+                            borderColor: weighted ? 'rgba(13, 148, 136, 0.2)' : '#0d9488',
                             borderWidth: 1,
                             borderRadius: 3,
-                            yAxisID: 'yReps',
+                            yAxisID: weighted ? 'yReps' : 'y',
                             order: 2
                         },
-                        {
+                        // Unweighted (bodyweight/core) exercises chart reps only.
+                        ...(!weighted ? [] : [{
                             label: 'Weight (lbs)',
                             type: 'line',
                             data: sorted.map(d => d.weight),
@@ -1577,7 +1832,7 @@
                             borderWidth: 2,
                             yAxisID: 'y',
                             order: 1
-                        }
+                        }])
                     ]
                 },
                 options: {
@@ -1588,9 +1843,12 @@
                         legend: { display: true, position: 'top', align: 'end', labels: { boxWidth: 10, boxHeight: 10, padding: 8, font: { size: 11 }, usePointStyle: true, pointStyle: 'rectRounded' } },
                         tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label === 'Reps' ? `${ctx.parsed.y} reps` : `${ctx.parsed.y} lbs`; } } }
                     },
-                    scales: {
+                    scales: weighted ? {
                         y: { position: 'left', beginAtZero: false, grid: { color: '#e2e8f0' }, ticks: { callback: v => v + ' lbs', font: { size: 11 } } },
                         yReps: { position: 'right', beginAtZero: true, grid: { drawOnChartArea: false }, ticks: { stepSize: 1, callback: v => v + ' r', font: { size: 11 } } },
+                        x: { grid: { color: '#f1f5f9' } }
+                    } : {
+                        y: { position: 'left', beginAtZero: true, grid: { color: '#e2e8f0' }, ticks: { precision: 0, callback: v => v + ' r', font: { size: 11 } } },
                         x: { grid: { color: '#f1f5f9' } }
                     }
                 }
@@ -1761,7 +2019,7 @@
                 grouped.forEach(function(g) {
                     // Find the exercise to get primary/secondary
                     var ex = exercises.find(function(e) { return e.name === g.name && e.equipment === g.equip; });
-                    var setsStr = g.sets.map(function(s) { return (s.weight || 0) + '×' + (s.reps || 0); }).join(', ');
+                    var setsStr = g.sets.map(function(s) { return fmtSetShort(s.weight, s.reps); }).join(', ');
                     
                     html += '<div class="day-exercise-row">';
                     html += '<div style="flex:1;">';
@@ -1803,7 +2061,7 @@
     function editEntry(entry) {
         document.getElementById('edit-entry-id').value = entry.id;
         document.getElementById('edit-exercise-name').value = `${entry.exercise} (${entry.equipment})`;
-        document.getElementById('edit-weight').value = entry.weight;
+        document.getElementById('edit-weight').value = (Number(entry.weight) || 0) > 0 ? entry.weight : '';
         document.getElementById('edit-reps').value = entry.reps;
         document.getElementById('edit-date').value = entry.date;
         document.getElementById('edit-modal').classList.add('active');
@@ -1814,15 +2072,18 @@
     document.getElementById('edit-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const id = document.getElementById('edit-entry-id').value;
-        const weight = parseFloat(document.getElementById('edit-weight').value);
+        const weightRaw = document.getElementById('edit-weight').value.trim();
+        const weight = weightRaw === '' ? 0 : parseFloat(weightRaw);
         const reps = parseInt(document.getElementById('edit-reps').value);
         const date = document.getElementById('edit-date').value;
+        if (isNaN(weight) || weight < 0) { showToast('Enter a valid weight.', 'error'); return; }
+        if (!reps || reps < 1) { showToast('Enter valid reps.', 'error'); return; }
         if (!db) { showToast('Database error.', 'error'); return; }
         try {
             await db.collection('workouts').doc(id).update({ weight, reps, date });
             const entry = workoutData.find(e => e.id === id);
             if (entry) { entry.weight = weight; entry.reps = reps; entry.date = date; }
-            closeEditModal(); renderProgress(); renderTodaysWorkouts(); renderSummary(); renderLogMuscleCoverage();
+            closeEditModal(); refreshLogViews();
             showToast('Entry updated!');
         } catch (error) { showToast('Error updating entry.', 'error'); }
     });
@@ -1835,7 +2096,7 @@
         try {
             await db.collection('workouts').doc(id).delete();
             workoutData = workoutData.filter(e => e.id !== id);
-            renderProgress(); renderTodaysWorkouts(); renderSummary(); renderLogMuscleCoverage();
+            refreshLogViews();
             showToast('Entry deleted.');
         } catch (error) { showToast('Error deleting entry.', 'error'); }
     }
@@ -1871,7 +2132,8 @@
             lines.forEach(line => {
                 if (line.trim()) {
                     const [muscle, exercise, equipment, weight, reps, date] = line.split(',');
-                    imported.push({ muscle: muscle.trim(), exercise: exercise.trim(), equipment: equipment.trim(), weight: parseFloat(weight), reps: parseInt(reps), date: date.trim(), timestamp: firebase.firestore.Timestamp.now() });
+                    // Blank weight column = unweighted set, stored as 0.
+                    imported.push({ muscle: muscle.trim(), exercise: exercise.trim(), equipment: equipment.trim(), weight: parseFloat(weight) || 0, reps: parseInt(reps) || 0, date: date.trim(), timestamp: firebase.firestore.Timestamp.now() });
                 }
             });
             if (imported.length === 0) { showToast('No valid data in CSV.', 'error'); return; }
@@ -1885,7 +2147,7 @@
                 imported.forEach(entry => { const docRef = db.collection('workouts').doc(); batch.set(docRef, entry); });
                 await batch.commit();
                 await loadData(); closeImportModal();
-                renderProgress(); renderTodaysWorkouts(); renderSummary(); renderLogMuscleCoverage();
+                refreshLogViews();
                 showToast(mode === 'replace' ? 'Data replaced!' : 'Data imported!');
             } catch (error) { showToast('Import error.', 'error'); }
         };
@@ -1903,7 +2165,7 @@
             snapshot.docs.forEach(doc => batch.delete(doc.ref));
             await batch.commit();
             workoutData = [];
-            renderProgress(); renderTodaysWorkouts(); renderSummary(); renderLogMuscleCoverage();
+            refreshLogViews();
             showToast('All data cleared.');
         } catch (error) { showToast('Error clearing data.', 'error'); }
     }

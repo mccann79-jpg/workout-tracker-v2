@@ -139,6 +139,8 @@
             -webkit-backdrop-filter: blur(16px) saturate(1.5);
         }
         .exercise-picker:empty { display: none; }
+        /* Collapsed until the search field is focused, so the form stays short on a phone. */
+        .exercise-picker.collapsed { display: none; }
         .picker-group-label {
             padding: 6px 12px 3px;
             font-size: 11px;
@@ -299,6 +301,15 @@
         ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.10); border-radius: 3px; }
 
         /* ─── History ─── */
+        /* Phones: the session is what you need mid-workout, so it goes above the
+           form. The grid only becomes two columns at 768px, where source order
+           already puts the form on the left. */
+        .log-grid { display: flex; flex-direction: column; }
+        .log-col-session { order: -1; }
+        @media (min-width: 768px) {
+            .log-col-session { order: 0; }
+        }
+
         .muscle-coverage-summary {
             background: var(--bg-card);
             backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
@@ -321,8 +332,16 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
             margin-bottom: 12px;
         }
+        .coverage-header-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; background: none; border: none; padding: 0; font-family: var(--font); color: inherit; cursor: pointer; text-align: left; }
+        .coverage-count { font-size: 11px; font-weight: 700; color: var(--accent-text); background: rgba(13,148,136,0.12); border: 1px solid rgba(13,148,136,0.15); border-radius: 20px; padding: 2px 8px; white-space: nowrap; }
+        .coverage-chevron { color: var(--text-muted); flex-shrink: 0; transition: transform .2s; }
+        .muscle-coverage-summary.collapsed .coverage-chevron { transform: rotate(-90deg); }
+        .muscle-coverage-summary.collapsed .coverage-header-row { margin-bottom: 0; }
+        .muscle-coverage-summary.collapsed .coverage-grid,
+        .muscle-coverage-summary.collapsed .coverage-legend { display: none; }
         .coverage-days-dropdown {
             width: auto;
             padding: 5px 28px 5px 12px;
@@ -480,9 +499,8 @@
             <!-- LOG -->
             <div id="log-page" class="page active"><div class="page-inner">
                 <div id="summary-bar" class="summary-bar" style="display:none;"></div>
-                <div id="log-muscle-coverage" class="muscle-coverage-summary" style="margin-bottom:12px;"></div>
                 <div class="log-grid">
-                    <div>
+                    <div class="log-col-form">
                         <div class="card">
                             <div class="card-title"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Log Workout</div>
                             <div id="success-msg" style="display:none;"></div>
@@ -494,7 +512,7 @@
                                         <button type="button" id="exercise-search-clear" class="search-clear" style="display:none;" onclick="clearExerciseSearch()" aria-label="Clear search"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
                                     </div>
                                     <input type="hidden" id="exercise-select-value" required>
-                                    <div id="exercise-picker" class="exercise-picker"></div>
+                                    <div id="exercise-picker" class="exercise-picker collapsed"></div>
                                 </div>
                                 <div id="exercise-details" style="display:none;">
                                     <div class="form-group"><span class="tag tag-equipment" id="equipment-type"></span><span id="exercise-muscles-info" style="margin-left:8px;font-size:11px;"></span></div>
@@ -511,11 +529,12 @@
                             </form>
                         </div>
                     </div>
-                    <div>
+                    <div class="log-col-session">
                         <div id="session-container"></div>
                         <div id="todays-workouts-container"></div>
                     </div>
                 </div>
+                <div id="log-muscle-coverage" class="muscle-coverage-summary"></div>
             </div></div>
 
             <!-- HISTORY -->
@@ -983,7 +1002,14 @@
             }
         });
 
-        let html = '<div class="coverage-header-row"><div class="coverage-title">Muscle Coverage</div>';
+        const hitCount = allMuscles.filter(m => hitPrimary.has(m) || hitSecondary.has(m)).length;
+
+        let html = '<div class="coverage-header-row">';
+        html += '<button type="button" class="coverage-header-left" onclick="toggleCoverage()" aria-expanded="' + (coverageOpen ? 'true' : 'false') + '">';
+        html += '<svg class="coverage-chevron" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>';
+        html += '<div class="coverage-title">Muscle Coverage</div>';
+        html += '<span class="coverage-count">' + hitCount + '/' + allMuscles.length + '</span>';
+        html += '</button>';
         html += '<select id="coverage-days-select" class="coverage-days-dropdown" onchange="coverageDays=parseInt(this.value);renderLogMuscleCoverage();">';
         for (var i = 1; i <= 7; i++) {
             html += '<option value="' + i + '"' + (i === coverageDays ? ' selected' : '') + '>' + (i === 1 ? '1 Day' : i + ' Days') + '</option>';
@@ -1026,7 +1052,18 @@
         html += '</div>';
         
         container.innerHTML = html;
+        container.classList.toggle('collapsed', !coverageOpen);
         container.style.display = 'block';
+    }
+
+    // Collapsed by default — it's a review panel, and on a phone it otherwise
+    // pushes the form and session below the fold.
+    var coverageOpen = false;
+    try { coverageOpen = localStorage.getItem('lift-coverage-open') === '1'; } catch (e) {}
+    function toggleCoverage() {
+        coverageOpen = !coverageOpen;
+        try { localStorage.setItem('lift-coverage-open', coverageOpen ? '1' : '0'); } catch (e) {}
+        renderLogMuscleCoverage();
     }
 
     // ═══ Summary Stats ═══
@@ -1182,6 +1219,9 @@
         picker.innerHTML = count ? html : '<div class="picker-empty">No exercises match</div>';
     }
 
+    function openPicker() { document.getElementById('exercise-picker').classList.remove('collapsed'); }
+    function closePicker() { document.getElementById('exercise-picker').classList.add('collapsed'); }
+
     function selectExercise(idx) {
         selectedExerciseIdx = idx;
         document.getElementById('exercise-select-value').value = idx;
@@ -1191,6 +1231,14 @@
 
         // Show details
         const exercise = exercises[idx];
+
+        // Name the picked exercise in the field and fold the list away, so the form
+        // stays short and it's still obvious what's selected.
+        const searchInput = document.getElementById('exercise-search');
+        searchInput.value = exercise.name;
+        updateSearchClear();
+        closePicker();
+
         const details = document.getElementById('exercise-details');
         const lastWorkoutDiv = document.getElementById('last-workout-info');
         const musclesInfo = document.getElementById('exercise-muscles-info');
@@ -1236,12 +1284,22 @@
         input.value = '';
         populateExerciseDropdown('');
         updateSearchClear();
+        openPicker();
         input.focus();
     }
 
     document.getElementById('exercise-search').addEventListener('input', function() {
         populateExerciseDropdown(this.value);
         updateSearchClear();
+        openPicker();
+    });
+
+    // Focusing the field reopens the full list and selects any existing text, so
+    // typing replaces the previously picked exercise instead of appending to it.
+    document.getElementById('exercise-search').addEventListener('focus', function() {
+        populateExerciseDropdown('');
+        openPicker();
+        if (this.value) { try { this.setSelectionRange(0, this.value.length); } catch (e) {} }
     });
 
     // ═══ Keep a focused search field above the on-screen keyboard ═══

@@ -218,34 +218,39 @@
         .muscle-header::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.25); }
 
         /* ─── Today ─── */
-        .today-section-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin: 16px 0 8px; }
-        .today-card { background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; border: var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-inner-glow); display: flex; justify-content: space-between; align-items: center; }
-        .today-card-info { flex: 1; }
-        .today-card-name { font-weight: 600; font-size: 14px; }
-        .today-card-stats { font-family: var(--font-mono); font-size: 17px; font-weight: 700; color: var(--accent); text-align: right; }
-        .today-card-subtitle { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .today-section-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin: 12px 0 6px; }
+        .today-card { background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border-radius: var(--radius-sm); padding: 8px 11px; margin-bottom: 7px; border: var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-inner-glow); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .today-card-info { flex: 1; min-width: 0; }
+        .today-card-name { font-weight: 600; font-size: 14px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .today-card-stats { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--accent); text-align: right; white-space: nowrap; }
+        .today-card-subtitle { font-size: 10.5px; color: var(--text-muted); margin-top: 1px; }
+        .today-card .btn-icon { width: 28px; height: 28px; }
 
         /* ─── Session Builder ─── */
-        .session-card { background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; border: var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-inner-glow); border-left: 3px solid rgba(148,163,184,0.35); }
+        .session-card { background: var(--bg-card); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); border-radius: var(--radius-sm); padding: 9px 11px; margin-bottom: 7px; border: var(--glass-border); box-shadow: var(--glass-shadow), var(--glass-inner-glow); border-left: 3px solid rgba(148,163,184,0.35); }
         .session-card.done { border-left-color: var(--green); }
-        .session-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-        .session-name { font-weight: 600; font-size: 14px; line-height: 1.25; }
-        .session-equip { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-        .session-stats { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-        .session-stat { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: rgba(255,255,255,0.40); border: 1px solid rgba(255,255,255,0.25); color: var(--text-muted); font-weight: 600; letter-spacing: .3px; }
-        .session-stat strong { font-family: var(--font-mono); font-size: 12px; color: var(--text-primary); font-weight: 700; }
+        .session-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+        /* Name and equipment share one line; the name truncates rather than wrapping. */
+        .session-title { display: flex; align-items: baseline; gap: 6px; min-width: 0; flex: 1; }
+        .session-name { font-weight: 600; font-size: 14px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .session-equip { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+        .session-actions { display: flex; align-items: center; flex-shrink: 0; }
+        .session-stats { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+        .session-stat { font-size: 10.5px; padding: 2px 7px; border-radius: 20px; background: rgba(255,255,255,0.40); border: 1px solid rgba(255,255,255,0.25); color: var(--text-muted); font-weight: 600; }
+        .session-stat strong { font-family: var(--font-mono); font-size: 11px; color: var(--text-primary); font-weight: 700; }
         .session-stat .session-stat-date { color: var(--text-muted); font-weight: 500; }
         .session-stat.is-pr { background: rgba(217,119,6,0.12); border-color: rgba(217,119,6,0.18); color: var(--yellow); }
         .session-stat.is-pr strong { color: var(--yellow); }
-        .session-entry-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; margin-top: 10px; align-items: center; }
-        .session-entry-row input { padding: 10px 8px; font-size: 16px; text-align: center; font-family: var(--font-mono); font-weight: 700; }
-        .session-log-btn { width: 44px; height: 42px; padding: 0; flex-shrink: 0; }
-        .session-sets { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-        .session-set-chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 3px 5px 3px 9px; border-radius: 9px; background: rgba(13,148,136,0.10); color: var(--accent-text); border: 1px solid rgba(13,148,136,0.15); }
+        .session-entry-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 5px; margin-top: 6px; align-items: center; }
+        /* Font stays at 16px to avoid iOS focus zoom; height comes off the padding. */
+        .session-entry-row input { padding: 6px 6px; font-size: 16px; text-align: center; font-family: var(--font-mono); font-weight: 700; }
+        .session-log-btn { width: 42px; height: 34px; padding: 0; flex-shrink: 0; }
+        .session-sets { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+        .session-set-chip { display: inline-flex; align-items: center; gap: 3px; font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 2px 4px 2px 7px; border-radius: 8px; background: rgba(13,148,136,0.10); color: var(--accent-text); border: 1px solid rgba(13,148,136,0.15); }
         .session-set-chip.is-pr { background: rgba(217,119,6,0.12); color: var(--yellow); border-color: rgba(217,119,6,0.20); }
         .session-set-chip button { background: none; border: none; color: currentColor; opacity: .45; cursor: pointer; padding: 0 2px; font-size: 13px; line-height: 1; font-family: var(--font); }
         .session-set-chip button:hover { opacity: 1; }
-        .session-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; width: 30px; height: 30px; padding: 0; border-radius: 8px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; transition: background .15s, color .15s; }
+        .session-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; width: 26px; height: 26px; padding: 0; border-radius: 7px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; transition: background .15s, color .15s; }
         .session-remove:hover:not([disabled]) { background: rgba(0,0,0,0.05); color: var(--text-primary); }
         .session-remove[aria-label="Remove from session"]:hover { color: var(--red); }
         .picker-add { width: 28px; height: 28px; flex-shrink: 0; margin-left: 10px; padding: 0; border-radius: 8px; border: 1px solid rgba(13,148,136,0.25); background: rgba(13,148,136,0.10); color: var(--accent-text); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background .15s; }
@@ -890,11 +895,12 @@
         sessionPlan.forEach((item, i) => {
             const { last, pr, priorPR, todaySets } = exerciseStats(item.name, item.equipment);
 
+            // Short forms (135×8) keep Last and PR on a single line on a phone.
             const lastHtml = last
-                ? `<span class="session-stat">Last <strong>${fmtSet(last.top.weight, last.top.reps)}</strong><span class="session-stat-date">${last.count > 1 ? ` · ${last.count} sets` : ''} · ${formatDate(last.date)}</span></span>`
+                ? `<span class="session-stat">Last <strong>${fmtSetShort(last.top.weight, last.top.reps)}</strong><span class="session-stat-date">${last.count > 1 ? ` · ${last.count} sets` : ''} · ${formatDate(last.date)}</span></span>`
                 : `<span class="session-stat">Last <strong>—</strong></span>`;
             const prHtml = pr
-                ? `<span class="session-stat is-pr">PR <strong>${fmtSet(pr.weight, pr.reps)}</strong></span>`
+                ? `<span class="session-stat is-pr">PR <strong>${fmtSetShort(pr.weight, pr.reps)}</strong></span>`
                 : `<span class="session-stat">PR <strong>—</strong></span>`;
 
             const setsHtml = todaySets.map(s => {
@@ -905,11 +911,11 @@
             html += `
                 <div class="session-card${todaySets.length ? ' done' : ''}">
                     <div class="session-head">
-                        <div style="flex:1;min-width:0;">
-                            <div class="session-name">${esc(item.name)}</div>
-                            <div class="session-equip">${esc(item.equipment)}${todaySets.length ? ` · ${todaySets.length} set${todaySets.length === 1 ? '' : 's'} today` : ''}</div>
+                        <div class="session-title">
+                            <span class="session-name">${esc(item.name)}</span>
+                            <span class="session-equip">${esc(item.equipment)}</span>
                         </div>
-                        <div style="display:flex;align-items:center;gap:2px;flex-shrink:0;">
+                        <div class="session-actions">
                             <button class="session-remove" onclick="moveInSession(${i},-1)" aria-label="Move up" ${i === 0 ? 'disabled style="opacity:.25;"' : ''}><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg></button>
                             <button class="session-remove" onclick="moveInSession(${i},1)" aria-label="Move down" ${i === sessionPlan.length - 1 ? 'disabled style="opacity:.25;"' : ''}><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
                             <button class="session-remove" onclick="removeFromSession(${i})" aria-label="Remove from session"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>

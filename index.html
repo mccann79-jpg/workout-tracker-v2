@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="LIFT">
-    <meta name="theme-color" content="#0d9488">
+    <meta name="theme-color" content="#eef2ff">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -77,15 +77,8 @@
         }
 
         .app { display: flex; flex-direction: column; height: 100%; height: 100dvh; height: -webkit-fill-available; }
-        .status-bar-spacer { min-height: var(--safe-top); background: rgba(13,148,136,0.75); backdrop-filter: blur(30px) saturate(1.8); -webkit-backdrop-filter: blur(30px) saturate(1.8); }
-
-        /* ─── Header ─── */
-        .header { background: rgba(13,148,136,0.75); backdrop-filter: blur(30px) saturate(1.8); -webkit-backdrop-filter: blur(30px) saturate(1.8); padding: 20px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.18); box-shadow: 0 4px 20px rgba(13,148,136,0.15), inset 0 -1px 0 rgba(255,255,255,0.1); flex-shrink: 0; }
-        .header-row { display: flex; align-items: center; justify-content: space-between; }
-        .logo { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: 4px; }
-        .header-subtitle { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 1px; }
-        .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; display: inline-block; margin-right: 4px; animation: pulse-dot 2s infinite; }
-        @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
+        /* Page background flows up behind the status bar — no header to separate it from. */
+        .status-bar-spacer { min-height: var(--safe-top); flex-shrink: 0; }
 
         /* ─── Pages ─── */
         .pages-container { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; min-height: 0; }
@@ -442,8 +435,6 @@
         /* ═══ RESPONSIVE — Tablet 768px+ ═══ */
         @media (min-width: 768px) {
             .page { padding: 20px 28px 28px; }
-            .header { padding: 10px 28px 12px; }
-            .logo { font-size: 24px; }
             .log-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
             #progress-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
             #progress-container .muscle-header { grid-column: 1 / -1; }
@@ -463,7 +454,6 @@
         /* ═══ Desktop 1024px+ ═══ */
         @media (min-width: 1024px) {
             .page { padding: 24px 40px 36px; }
-            .header { padding: 12px 40px 14px; }
             #progress-container { grid-template-columns: 1fr 1fr 1fr; }
             .chart-container { height: 220px; }
             .exercises-grid { grid-template-columns: 400px 1fr; }
@@ -481,14 +471,6 @@
 <body>
     <div class="app">
         <div class="status-bar-spacer"></div>
-        <div class="header">
-            <div class="header-row">
-                <div>
-                    <div class="logo">LIFT</div>
-                    <div class="header-subtitle"><span class="sync-dot"></span>Synced across devices</div>
-                </div>
-            </div>
-        </div>
 
         <div class="pages-container">
             <!-- LOG -->
@@ -784,7 +766,9 @@
         };
     }
 
-    function refreshLogViews() { renderProgress(); renderTodaysWorkouts(); renderSession(); renderSummary(); renderLogMuscleCoverage(); }
+    // Progress is deliberately not refreshed here — showPage() rebuilds it when that
+    // tab is opened, and redrawing every chart on each logged set makes logging lag.
+    function refreshLogViews() { renderTodaysWorkouts(); renderSession(); renderSummary(); renderLogMuscleCoverage(); }
 
     // ═══ Session Builder ═══
     // Exercises queued for today's workout. Weight/reps are filled in set by set
@@ -1638,9 +1622,14 @@
     }
 
     // ═══ Render Progress — with teal charts ═══
+    let progressCharts = [];
     function renderProgress() {
         const container = document.getElementById('progress-container');
         const filter = document.getElementById('muscle-filter').value;
+        // Wiping innerHTML orphans the canvases but not the Chart instances holding
+        // them, so tear them down first or every visit leaks another full set.
+        progressCharts.forEach(c => { try { c.destroy(); } catch (e) {} });
+        progressCharts = [];
         container.innerHTML = '';
         if (workoutData.length === 0) { container.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon">📊</div><div class="empty-state-text">No data yet. Start logging workouts!</div></div>'; return; }
         const filteredExercises = exercises.filter(ex => !filter || ex.muscle === filter)
@@ -1688,7 +1677,7 @@
             `;
             container.appendChild(card);
             // Teal chart
-            new Chart(document.getElementById(`chart-${exercise.name}-${exercise.equipment}`), {
+            progressCharts.push(new Chart(document.getElementById(`chart-${exercise.name}-${exercise.equipment}`), {
                 type: 'bar',
                 data: {
                     labels: sorted.map(d => formatDate(d.date)),
@@ -1739,7 +1728,7 @@
                         x: { grid: { color: '#f1f5f9' } }
                     }
                 }
-            });
+            }));
         });
     }
 

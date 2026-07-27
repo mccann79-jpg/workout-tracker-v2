@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(node -e \"require.resolve\\('jsdom'\\);console.log\\('jsdom ok'\\)\")",
+      "Bash(npm ls *)",
+      "Read(//Users/brendanmccann/Library/Caches/ms-playwright/**)",
+      "Read(//Applications/Google Chrome.app/**)",
+      "Bash(npm i *)",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright-core'\\)\\)\")",
+      "Bash(PLAYWRIGHT_BROWSERS_PATH=/Users/brendanmccann/Library/Caches/ms-playwright node test.mjs)",
+      "Bash(sed -i '' \"s|chromium.launch\\(\\)|chromium.launch\\({ executablePath: process.env.HOME + '/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell' }\\)|\" test.mjs)",
+      "Bash(node test.mjs)",
+      "Bash(python3 -)",
+      "Bash(pkill -f \"http.server 8777\")",
+      "Bash(git -C /Users/brendanmccann/Documents/GitHub/workout-tracker-v2 diff --stat)",
+      "Bash(perl -i -pe 's/^\\\\s*\\\\.header \\\\{ padding: 10px 28px 12px; \\\\}\\\\n//; s/^\\\\s*\\\\.header \\\\{ padding: 12px 40px 14px; \\\\}\\\\n//' index.html)",
+      "Bash(perl -i -pe 's|<meta name=\"theme-color\" content=\"#0d9488\">|<meta name=\"theme-color\" content=\"#eef2ff\">|' index.html)",
+      "Bash(perl -i -pe 's/^\\\\s*\\\\.logo \\\\{ font-size: 24px; \\\\}\\\\n//' index.html)"
+    ]
+  }
+}

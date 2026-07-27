@@ -1,0 +1,5 @@
+# Claude Code scratch worktrees — nested checkouts of this repo, not source
+.claude/worktrees/
+
+# macOS
+.DS_Store

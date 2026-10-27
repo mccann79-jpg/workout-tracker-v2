@@ -268,6 +268,11 @@
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 1000; align-items: flex-end; justify-content: center; }
         .modal-overlay.active { display: flex; }
         .modal-sheet { background: #ffffff; border-radius: 24px 24px 0 0; padding: 24px 24px calc(24px + var(--safe-bottom)); width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; animation: slideUp .3s ease; border: 1px solid var(--border); border-bottom: none; box-shadow: 0 -8px 32px rgba(15,23,42,0.10); }
+        .template-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .template-bar .template-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); margin-right: 2px; }
+        .tpl-row { display: grid; grid-template-columns: 1fr 52px 78px auto; gap: 6px; align-items: center; margin-bottom: 8px; }
+        .tpl-row select, .tpl-row input { min-width: 0; }
+        .session-target { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
         @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
         .modal-handle { width: 40px; height: 5px; background: rgba(0,0,0,0.12); border-radius: 3px; margin: 0 auto 16px; }
         .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; }
@@ -534,6 +539,7 @@
                         </div>
                     </div>
                     <div class="log-col-session">
+                        <div id="template-bar" class="template-bar"></div>
                         <div id="session-container"></div>
                         <div id="todays-workouts-container"></div>
                     </div>
@@ -632,6 +638,20 @@
         </div>
     </div>
 
+    <!-- Template Modal -->
+    <div id="template-modal" class="modal-overlay">
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-title">Edit Template</div>
+            <div class="form-group"><label class="form-label">Name</label><input type="text" id="tpl-name" maxlength="30"></div>
+            <div class="form-group"><label class="form-label">Exercises <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;">exercise · sets · reps</span></label><div id="tpl-rows"></div></div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="addTemplateRow()">+ Add exercise</button>
+            <button type="button" class="btn btn-primary" style="margin-top:12px;" onclick="saveTemplateEdit()">Save</button>
+            <button type="button" class="btn btn-secondary" style="margin-top:8px;" onclick="closeTemplateModal()">Cancel</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="resetTemplate()">Reset to default</button>
+        </div>
+    </div>
+
     <!-- Import Modal -->
     <div id="import-modal" class="modal-overlay">
         <div class="modal-sheet">
@@ -701,6 +721,7 @@
         {muscle: "QUADS", name: "Leg Press", equipment: "Machine", primary: ["Quads"], secondary: ["Glutes", "Hamstrings"]},
         {muscle: "QUADS", name: "Leg Extension", equipment: "Machine", primary: ["Quads"], secondary: []},
         {muscle: "QUADS", name: "Walking Lunge", equipment: "Dumbbells", primary: ["Quads", "Glutes"], secondary: ["Hamstrings", "Core"]},
+        {muscle: "QUADS", name: "Bulgarian Split Squat", equipment: "Dumbbells", primary: ["Quads", "Glutes"], secondary: ["Hamstrings", "Core"]},
         // HAMSTRINGS
         {muscle: "HAMSTRINGS", name: "Romanian Deadlift", equipment: "Barbell", primary: ["Hamstrings", "Glutes"], secondary: ["Lower Back", "Core"]},
         {muscle: "HAMSTRINGS", name: "Deadlift", equipment: "Barbell", primary: ["Hamstrings", "Glutes", "Lower Back"], secondary: ["Quads", "Lats", "Traps", "Core", "Forearms"]},
@@ -723,6 +744,7 @@
         {muscle: "SHOULDERS", name: "Lateral Raise", equipment: "Cable", primary: ["Side Delts"], secondary: []},
         {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Machine", primary: ["Rear Delts"], secondary: ["Rhomboids", "Traps"]},
         {muscle: "SHOULDERS", name: "Reverse Pec Deck", equipment: "Cable", primary: ["Rear Delts"], secondary: ["Rhomboids", "Traps"]},
+        {muscle: "SHOULDERS", name: "Face Pull", equipment: "Cable", primary: ["Rear Delts"], secondary: ["Rhomboids", "Traps"]},
         // BICEPS
         {muscle: "BICEPS", name: "Bayesian Cable Curl", equipment: "Cable", primary: ["Biceps"], secondary: ["Forearms"]},
         {muscle: "BICEPS", name: "Preacher Curl", equipment: "EZ Bar/Dumbbells", primary: ["Biceps"], secondary: ["Forearms"]},
@@ -913,6 +935,7 @@
                         <div class="session-title">
                             <span class="session-name">${esc(item.name)}</span>
                             <span class="session-equip">${esc(item.equipment)}</span>
+                            ${item.target ? `<span class="session-target">${esc(item.target)}</span>` : ''}
                         </div>
                         <div class="session-actions">
                             <button class="session-remove" onclick="moveInSession(${i},-1)" aria-label="Move up" ${i === 0 ? 'disabled style="opacity:.25;"' : ''}><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg></button>
@@ -933,6 +956,126 @@
         container.innerHTML = html;
     }
 
+    // ═══ Templates ═══
+    // Preset workouts that fill the session in one tap. Defaults live in code; edits are
+    // saved to Firestore (workoutTemplates/<id>) and override the default with that id.
+    const defaultTemplates = [
+        { id: 'A', name: 'A', items: [
+            { name: 'Squat', equipment: 'Barbell', sets: 3, reps: '5–8' },
+            { name: 'Incline Bench Press', equipment: 'Dumbell', sets: 3, reps: '6–8' },
+            { name: 'Pull Up', equipment: 'Bodyweight + Weight', sets: 3, reps: '6–10' },
+            { name: 'Romanian Deadlift', equipment: 'Barbell', sets: 3, reps: '8–10' },
+            { name: 'Overhead Press', equipment: 'Dumbbells', sets: 3, reps: '8–12' }
+        ]},
+        { id: 'B', name: 'B', items: [
+            { name: 'Deadlift', equipment: 'Barbell', sets: 3, reps: '3–5' },
+            { name: 'Incline Bench Press', equipment: 'Dumbell', sets: 3, reps: '10–12' },
+            { name: 'One-armed Row', equipment: 'Dumbell', sets: 3, reps: '8–12' },
+            { name: 'Bulgarian Split Squat', equipment: 'Dumbbells', sets: 3, reps: '10–12' },
+            { name: 'Face Pull', equipment: 'Cable', sets: 3, reps: '12–15' }
+        ]}
+    ];
+    let templates = defaultTemplates.map(t => ({ ...t, items: t.items.map(i => ({ ...i })) }));
+    let editingTemplateId = null;
+
+    async function loadTemplates() {
+        if (!db) return;
+        try {
+            const s = await db.collection('workoutTemplates').get();
+            s.forEach(doc => {
+                const d = doc.data();
+                const idx = templates.findIndex(t => t.id === doc.id);
+                const t = { id: doc.id, name: d.name, items: d.items || [] };
+                if (idx >= 0) templates[idx] = t; else templates.push(t);
+            });
+        } catch (e) { console.error('Error loading templates:', e); }
+    }
+
+    function renderTemplateBar() {
+        document.getElementById('template-bar').innerHTML =
+            `<span class="template-label">Load</span>` +
+            templates.map(t => `<button class="btn btn-secondary btn-sm" onclick="loadTemplate('${esc(t.id)}')">${esc(t.name)}</button>`).join('') +
+            `<span class="template-label" style="margin-left:auto;">Edit</span>` +
+            templates.map(t => `<button class="btn btn-secondary btn-sm" onclick="openTemplateModal('${esc(t.id)}')" aria-label="Edit ${esc(t.name)}">${esc(t.name)}</button>`).join('');
+    }
+
+    function loadTemplate(id) {
+        const t = templates.find(x => x.id === id);
+        if (!t) return;
+        let added = 0;
+        t.items.forEach(it => {
+            const ex = exercises.find(e => e.name === it.name && e.equipment === it.equipment);
+            if (!ex) return;
+            const target = `${it.sets} × ${it.reps}`;
+            const existing = sessionPlan.find(p => p.name === it.name && p.equipment === it.equipment);
+            if (existing) { existing.target = target; return; }
+            sessionPlan.push({ name: ex.name, equipment: ex.equipment, muscle: ex.muscle, weight: '', reps: '', target });
+            added++;
+        });
+        saveSessionPlan();
+        renderSession();
+        refreshPicker();
+        showToast(added ? `Loaded ${t.name}: ${added} exercise${added === 1 ? '' : 's'}` : `${t.name} is already in the session.`, added ? 'success' : 'info');
+    }
+
+    function templateExerciseOptions(selected) {
+        return exercises.map(e => {
+            const key = `${e.name}|||${e.equipment}`;
+            return `<option value="${esc(key)}"${key === selected ? ' selected' : ''}>${esc(e.name)} (${esc(e.equipment)})</option>`;
+        }).join('');
+    }
+    function addTemplateRow(item) {
+        const it = item || { name: exercises[0].name, equipment: exercises[0].equipment, sets: 3, reps: '8–12' };
+        const row = document.createElement('div');
+        row.className = 'tpl-row';
+        row.innerHTML = `
+            <select aria-label="Exercise">${templateExerciseOptions(`${it.name}|||${it.equipment}`)}</select>
+            <input type="number" min="1" inputmode="numeric" value="${esc(it.sets)}" aria-label="Sets">
+            <input type="text" value="${esc(it.reps)}" placeholder="reps" aria-label="Reps">
+            <button type="button" class="session-remove" aria-label="Remove" onclick="this.parentElement.remove()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`;
+        document.getElementById('tpl-rows').appendChild(row);
+    }
+    function openTemplateModal(id) {
+        const t = templates.find(x => x.id === id);
+        if (!t) return;
+        editingTemplateId = t.id;
+        document.getElementById('tpl-name').value = t.name;
+        document.getElementById('tpl-rows').innerHTML = '';
+        t.items.forEach(addTemplateRow);
+        document.getElementById('template-modal').classList.add('active');
+    }
+    function closeTemplateModal() { document.getElementById('template-modal').classList.remove('active'); }
+
+    async function saveTemplateEdit() {
+        const name = document.getElementById('tpl-name').value.trim();
+        if (!name) { showToast('Enter a name.', 'error'); return; }
+        const items = [...document.querySelectorAll('#tpl-rows .tpl-row')].map(row => {
+            const [exName, equipment] = row.querySelector('select').value.split('|||');
+            const [setsEl, repsEl] = row.querySelectorAll('input');
+            return { name: exName, equipment, sets: parseInt(setsEl.value) || 3, reps: repsEl.value.trim() || '8–12' };
+        });
+        if (!items.length) { showToast('Add at least one exercise.', 'error'); return; }
+        if (!db) { showToast('Database error.', 'error'); return; }
+        try {
+            await db.collection('workoutTemplates').doc(editingTemplateId).set({ name, items });
+        } catch (e) { showToast('Error saving template.', 'error'); return; }
+        const idx = templates.findIndex(t => t.id === editingTemplateId);
+        templates[idx] = { id: editingTemplateId, name, items };
+        renderTemplateBar();
+        closeTemplateModal();
+        showToast('Template saved');
+    }
+    async function resetTemplate() {
+        const def = defaultTemplates.find(t => t.id === editingTemplateId);
+        if (!def) { showToast('No default for this template.', 'info'); return; }
+        if (!await showConfirm(`Reset ${def.name} to the original exercises?`)) return;
+        try { await db.collection('workoutTemplates').doc(def.id).delete(); }
+        catch (e) { showToast('Error resetting template.', 'error'); return; }
+        templates[templates.findIndex(t => t.id === def.id)] = { ...def, items: def.items.map(i => ({ ...i })) };
+        renderTemplateBar();
+        closeTemplateModal();
+    }
+
     // ═══ Init ═══
     async function init() {
         populateExerciseDropdown();
@@ -941,6 +1084,8 @@
         updateSearchClear();
         loadSessionPlan();
         await loadCustomExercises();
+        await loadTemplates();
+        renderTemplateBar();
         await loadData();
         renderProgress();
         renderTodaysWorkouts();

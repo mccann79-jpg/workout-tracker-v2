@@ -1296,7 +1296,7 @@
                 <div class="today-card">
                     <div class="today-card-info">
                         <div class="today-card-name">${entry.exercise}</div>
-                        <div class="today-card-subtitle"><span class="tag tag-equipment" style="font-size:10px;padding:2px 6px;">${entry.equipment}</span></div>
+                        <div class="today-card-subtitle"><span class="tag tag-equipment" style="font-size:10px;padding:2px 6px;">${entry.equipment}</span>${setTime(entry) ? `<span style="margin-left:6px;">${new Date(setTime(entry) * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>` : ''}</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <div class="today-card-stats">${(Number(entry.weight) || 0) > 0

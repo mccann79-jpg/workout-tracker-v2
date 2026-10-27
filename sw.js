@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lift-v6';
+const CACHE_NAME = 'lift-v7';
 
 self.addEventListener('install', event => {
     event.waitUntil(

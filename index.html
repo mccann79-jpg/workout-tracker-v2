@@ -220,6 +220,12 @@
         .today-card-name { font-weight: 600; font-size: 14px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .today-card-stats { font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: var(--accent); text-align: right; white-space: nowrap; }
         .today-card-subtitle { font-size: 10.5px; color: var(--text-muted); margin-top: 1px; }
+        .today-group { flex-direction: column; align-items: stretch; gap: 0; align-self: start; }
+        .today-group-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .today-group-header .today-card-name { flex: 0 1 auto; }
+        .today-set-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4px 0; border-top: 1px solid rgba(128,128,128,0.15); }
+        .today-set-info { display: flex; align-items: center; min-width: 0; }
+        .today-set-num { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
         .today-card .btn-icon { width: 28px; height: 28px; }
         /* Row actions are secondary — no chrome until you interact with them. */
         .today-card .btn-icon, .entry-item .btn-icon {
@@ -1290,27 +1296,44 @@
         const todaysWorkouts = workoutData.filter(d => d.date === today);
         if (todaysWorkouts.length === 0) { container.innerHTML = ''; return; }
 
-        let html = '<div class="today-grid"><div class="today-section-title">Today\'s Lifts</div>';
+        // Group sets by exercise + equipment, in order of first appearance
+        const groups = [];
+        const byKey = {};
         todaysWorkouts.forEach(entry => {
+            const key = entry.exercise + '||' + entry.equipment;
+            if (!byKey[key]) { byKey[key] = { exercise: entry.exercise, equipment: entry.equipment, sets: [] }; groups.push(byKey[key]); }
+            byKey[key].sets.push(entry);
+        });
+
+        let html = '<div class="today-grid"><div class="today-section-title">Today\'s Lifts</div>';
+        groups.forEach(g => {
             html += `
-                <div class="today-card">
-                    <div class="today-card-info">
-                        <div class="today-card-name">${entry.exercise}</div>
-                        <div class="today-card-subtitle"><span class="tag tag-equipment" style="font-size:10px;padding:2px 6px;">${entry.equipment}</span>${setTime(entry) ? `<span style="margin-left:6px;">${new Date(setTime(entry) * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>` : ''}</div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <div class="today-card-stats">${(Number(entry.weight) || 0) > 0
-                            ? `${entry.weight}<span style="font-size:12px;color:var(--text-muted);">lbs</span> × ${entry.reps}`
-                            : `${entry.reps}<span style="font-size:12px;color:var(--text-muted);">reps</span>`}</div>
-                        <div class="entry-actions">
-                            <button class="btn btn-secondary btn-icon" onclick='editEntry(${JSON.stringify(entry).replace(/'/g, "&#39;")})'>
-                                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                            </button>
-                            <button class="btn btn-danger btn-icon" onclick='confirmDeleteEntry("${entry.id}")'>
-                                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-                            </button>
+                <div class="today-card today-group">
+                    <div class="today-group-header">
+                        <div class="today-card-name">${g.exercise}</div>
+                        <span class="tag tag-equipment" style="font-size:10px;padding:2px 6px;">${g.equipment}</span>
+                    </div>`;
+            g.sets.forEach((entry, i) => {
+                const t = setTime(entry);
+                html += `
+                    <div class="today-set-row">
+                        <div class="today-set-info"><span class="today-set-num">Set ${i + 1}</span>${t ? `<span class="today-card-subtitle" style="margin:0 0 0 8px;">${new Date(t * 1000).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</span>` : ''}</div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div class="today-card-stats">${(Number(entry.weight) || 0) > 0
+                                ? `${entry.weight}<span style="font-size:12px;color:var(--text-muted);">lbs</span> × ${entry.reps}`
+                                : `${entry.reps}<span style="font-size:12px;color:var(--text-muted);">reps</span>`}</div>
+                            <div class="entry-actions">
+                                <button class="btn btn-secondary btn-icon" onclick='editEntry(${JSON.stringify(entry).replace(/'/g, "&#39;")})'>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                </button>
+                                <button class="btn btn-danger btn-icon" onclick='confirmDeleteEntry("${entry.id}")'>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    </div>`;
+            });
+            html += `
                 </div>
             `;
         });

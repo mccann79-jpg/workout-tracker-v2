@@ -1356,6 +1356,13 @@
     // ═══ Exercise Picker ═══
     let selectedExerciseIdx = null;
 
+    // Matches name, equipment, muscle group, and primary/secondary muscles.
+    function exerciseMatches(ex, term) {
+        if (!term) return true;
+        const fields = [ex.name, ex.equipment, ex.muscle, ...(ex.primary || []), ...(ex.secondary || [])];
+        return fields.some(f => String(f || '').toLowerCase().includes(term));
+    }
+
     function populateExerciseDropdown(filterTerm = '') {
         const picker = document.getElementById('exercise-picker');
         const sorted = exercises.map((ex, idx) => ({ ...ex, idx }))
@@ -1367,7 +1374,7 @@
         let count = 0;
 
         sorted.forEach(ex => {
-            if (term && !ex.name.toLowerCase().includes(term) && !ex.equipment.toLowerCase().includes(term) && !ex.muscle.toLowerCase().includes(term)) return;
+            if (!exerciseMatches(ex, term)) return;
             if (currentMuscle !== ex.muscle) {
                 currentMuscle = ex.muscle;
                 html += `<div class="picker-group-label">${ex.muscle}</div>`;
@@ -1652,7 +1659,7 @@
         let html = '', currentMuscle = '';
         const sorted = [...exercises].sort((a, b) => { if (a.muscle !== b.muscle) return a.muscle.localeCompare(b.muscle); return a.name.localeCompare(b.name); });
         sorted.forEach(ex => {
-            if (searchTerm && !ex.name.toLowerCase().includes(searchTerm) && !ex.equipment.toLowerCase().includes(searchTerm) && !ex.muscle.toLowerCase().includes(searchTerm)) return;
+            if (!exerciseMatches(ex, searchTerm)) return;
             if (currentMuscle !== ex.muscle) { currentMuscle = ex.muscle; html += `<div class="muscle-header">${ex.muscle}</div>`; }
             const isCustom = ex.isCustom === true;
             
